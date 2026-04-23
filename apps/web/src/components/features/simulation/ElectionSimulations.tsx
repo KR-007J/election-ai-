@@ -1,25 +1,76 @@
 "use client";
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const scenarios = [
-  { id: 'economy', title: 'Economic Shift', icon: '📈', impact: 'Moderate', desc: 'Simulate how a 2% change in inflation impacts voter turnout in swing states.' },
-  { id: 'turnout', title: 'Youth Surge', icon: '🔥', impact: 'High', desc: 'What if youth voter registration increases by 15% across all battlegrounds?' },
-  { id: 'policy', title: 'Climate Action', icon: '🌍', impact: 'Subtle', desc: 'Model the impact of a major climate bill on suburban voter sentiment.' },
+  {
+    id: "economy",
+    title: "Economic Shift",
+    icon: "EC",
+    impact: "Moderate",
+    desc: "Simulate how a 2% change in inflation impacts voter turnout in swing states.",
+  },
+  {
+    id: "turnout",
+    title: "Youth Surge",
+    icon: "YS",
+    impact: "High",
+    desc: "What if youth voter registration increases by 15% across all battlegrounds?",
+  },
+  {
+    id: "policy",
+    title: "Climate Action",
+    icon: "CA",
+    impact: "Subtle",
+    desc: "Model the impact of a major climate bill on suburban voter sentiment.",
+  },
+] as const;
+
+interface SimulationResult {
+  turnout: string;
+  swing: string;
+  confidence: string;
+  impactedVoters: string;
+}
+
+const baselineMetrics = [
+  { label: "Demographic Sync", value: 88 },
+  { label: "Polling Latency", value: 12 },
+  { label: "Historical Weight", value: 94 },
+  { label: "Data Samples", value: 65 },
+  { label: "Margin of Error", value: 41 },
+  { label: "District Variance", value: 77 },
 ];
 
 export const ElectionSimulations = () => {
   const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
   const [simulationRunning, setSimulationRunning] = useState(false);
+  const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
+  const [liveMetrics, setLiveMetrics] = useState<number[]>(baselineMetrics.map((metric) => metric.value));
 
-  const [simulationResult, setSimulationResult] = useState<any>(null);
+  useEffect(() => {
+    if (!simulationRunning) {
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setLiveMetrics((current) =>
+        current.map((value, index) => Math.min(100, Math.max(1, value + (index % 2 === 0 ? 3 : -2)))),
+      );
+    }, 450);
+
+    return () => window.clearInterval(interval);
+  }, [simulationRunning]);
 
   const handleRun = () => {
     setSimulationRunning(true);
     setSimulationResult(null);
-    setTimeout(() => {
+    setLiveMetrics(baselineMetrics.map((metric) => metric.value));
+
+    window.setTimeout(() => {
       setSimulationRunning(false);
+      setLiveMetrics(baselineMetrics.map((metric) => metric.value));
       setSimulationResult({
         turnout: "+4.2%",
         swing: "3.1% Shift",
@@ -31,42 +82,46 @@ export const ElectionSimulations = () => {
 
   return (
     <div className="space-y-8 safe-bottom">
-      {/* Scenario Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {scenarios.map((s) => (
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        {scenarios.map((scenario) => (
           <motion.button
-            key={s.id}
-            onClick={() => { setSelectedScenario(s.id); setSimulationResult(null); }}
+            key={scenario.id}
+            onClick={() => {
+              setSelectedScenario(scenario.id);
+              setSimulationResult(null);
+            }}
             whileHover={{ y: -4, scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className={`text-left p-6 rounded-2xl border transition-all duration-300 relative overflow-hidden group ${
-              selectedScenario === s.id 
-                ? 'bg-primary/10 border-primary/30 shadow-[0_0_30px_rgba(0,229,255,0.1)]' 
-                : 'bg-white/5 border-white/5 hover:border-white/10'
+            className={`relative overflow-hidden rounded-2xl border p-6 text-left transition-all duration-300 group ${
+              selectedScenario === scenario.id
+                ? "border-primary/30 bg-primary/10 shadow-[0_0_30px_rgba(0,229,255,0.1)]"
+                : "border-white/5 bg-white/5 hover:border-white/10"
             }`}
           >
-            {selectedScenario === s.id && (
-              <motion.div 
+            {selectedScenario === scenario.id && (
+              <motion.div
                 layoutId="active-scenario-glow"
-                className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none"
+                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"
               />
             )}
-            <div className="text-3xl mb-4 group-hover:scale-110 transition-transform duration-300">{s.icon}</div>
-            <h3 className="text-lg font-bold mb-2 tracking-tight text-white">{s.title}</h3>
-            <p className="text-sm leading-relaxed mb-4 text-slate-400">{s.desc}</p>
-            <div className="flex items-center justify-between">
-              <span className={`text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-lg border ${
-                s.impact === 'High' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 
-                s.impact === 'Moderate' ? 'bg-primary/10 text-primary border-primary/20' : 'bg-green-500/10 text-green-400 border-green-500/20'
-              }`}>
-                {s.impact} Impact
-              </span>
-            </div>
+            <div className="mb-4 text-3xl transition-transform duration-300 group-hover:scale-110">{scenario.icon}</div>
+            <h3 className="mb-2 text-lg font-bold tracking-tight text-white">{scenario.title}</h3>
+            <p className="mb-4 text-sm leading-relaxed text-slate-400">{scenario.desc}</p>
+            <span
+              className={`rounded-lg border px-2 py-1 text-[10px] font-bold uppercase tracking-widest ${
+                scenario.impact === "High"
+                  ? "border-red-500/20 bg-red-500/10 text-red-400"
+                  : scenario.impact === "Moderate"
+                    ? "border-primary/20 bg-primary/10 text-primary"
+                    : "border-green-500/20 bg-green-500/10 text-green-400"
+              }`}
+            >
+              {scenario.impact} Impact
+            </span>
           </motion.button>
         ))}
       </div>
 
-      {/* Simulation Workspace */}
       <AnimatePresence mode="wait">
         {selectedScenario ? (
           <motion.div
@@ -74,110 +129,96 @@ export const ElectionSimulations = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98 }}
-            className="glass-panel p-12 min-h-[440px] flex flex-col items-center justify-center text-center relative overflow-hidden rounded-[2rem] border border-white/5"
+            className="glass-panel relative flex min-h-[440px] flex-col items-center justify-center overflow-hidden rounded-[2rem] border border-white/5 p-12 text-center"
           >
             {simulationRunning ? (
-              <div className="space-y-8 z-20">
+              <div className="z-20 space-y-8">
                 <div className="relative">
-                  <motion.div 
-                    animate={{ 
-                      rotate: 360,
-                    }}
-                    transition={{ 
-                      rotate: { duration: 2, repeat: Infinity, ease: "linear" },
-                    }}
-                    className="w-24 h-24 border-2 border-primary/10 border-t-primary rounded-full mx-auto"
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ rotate: { duration: 2, repeat: Infinity, ease: "linear" } }}
+                    className="mx-auto h-24 w-24 rounded-full border-2 border-primary/10 border-t-primary"
                   />
-                  <div className="absolute inset-0 flex items-center justify-center text-3xl">📊</div>
+                  <div className="absolute inset-0 flex items-center justify-center text-3xl">AI</div>
                 </div>
                 <div>
-                  <h4 className="text-2xl font-bold mb-3 tracking-tight text-white uppercase tracking-wider">Analyzing Data Points</h4>
-                  <p className="text-base max-w-sm mx-auto text-slate-500">
-                    Modeling {scenarios.find(s => s.id === selectedScenario)?.title} against current district demographics.
+                  <h4 className="mb-3 text-2xl font-bold uppercase tracking-wider text-white">Analyzing Data Points</h4>
+                  <p className="mx-auto max-w-sm text-base text-slate-500">
+                    Modeling {scenarios.find((scenario) => scenario.id === selectedScenario)?.title} against current district demographics.
                   </p>
                 </div>
               </div>
             ) : simulationResult ? (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="z-20 w-full max-w-4xl"
-              >
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="z-20 w-full max-w-4xl">
                 <div className="mb-8">
-                  <span className="badge bg-green-500/20 text-green-400 px-4 py-1 text-xs font-bold uppercase mb-4">Simulation Complete</span>
-                  <h4 className="text-3xl font-bold text-white mb-2">Impact Analysis Report</h4>
-                  <p className="text-slate-500">Projected outcomes for the {scenarios.find(s => s.id === selectedScenario)?.title} scenario.</p>
+                  <span className="badge mb-4 bg-green-500/20 px-4 py-1 text-xs font-bold uppercase text-green-400">Simulation Complete</span>
+                  <h4 className="mb-2 text-3xl font-bold text-white">Impact Analysis Report</h4>
+                  <p className="text-slate-500">
+                    Projected outcomes for the {scenarios.find((scenario) => scenario.id === selectedScenario)?.title} scenario.
+                  </p>
                 </div>
-                
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+
+                <div className="mb-10 grid grid-cols-2 gap-6 md:grid-cols-4">
                   {[
                     { label: "Turnout Shift", value: simulationResult.turnout, color: "text-primary" },
                     { label: "Voter Swing", value: simulationResult.swing, color: "text-purple-400" },
                     { label: "Confidence", value: simulationResult.confidence, color: "text-green-400" },
                     { label: "Reach", value: simulationResult.impactedVoters, color: "text-orange-400" },
-                  ].map((res) => (
-                    <div key={res.label} className="p-6 rounded-2xl bg-white/5 border border-white/5">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">{res.label}</p>
-                      <p className={`text-2xl font-h1 ${res.color}`}>{res.value}</p>
+                  ].map((result) => (
+                    <div key={result.label} className="rounded-2xl border border-white/5 bg-white/5 p-6">
+                      <p className="mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500">{result.label}</p>
+                      <p className={`text-2xl font-h1 ${result.color}`}>{result.value}</p>
                     </div>
                   ))}
                 </div>
 
-                <button 
+                <button
                   onClick={handleRun}
-                  className="px-8 py-3 bg-white/5 border border-white/10 rounded-xl text-sm font-bold text-white hover:bg-white/10 transition-all"
+                  className="rounded-xl border border-white/10 bg-white/5 px-8 py-3 text-sm font-bold text-white transition-all hover:bg-white/10"
                 >
                   Rerun Simulation
                 </button>
               </motion.div>
             ) : (
-              <div className="max-w-md z-20">
-                <motion.div 
+              <div className="z-20 max-w-[480px]">
+                <motion.div
                   initial={{ scale: 0.8 }}
                   animate={{ scale: 1 }}
-                  className="w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-3xl mx-auto mb-8 shadow-glow"
+                  className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-3xl shadow-glow"
                 >
-                  {scenarios.find(s => s.id === selectedScenario)?.icon}
+                  {scenarios.find((scenario) => scenario.id === selectedScenario)?.icon}
                 </motion.div>
-                <h4 className="text-3xl font-bold mb-4 tracking-tight text-white">Initialize Model</h4>
-                <p className="text-base mb-10 text-slate-400 leading-relaxed">
-                  Project the outcome of the <strong>{scenarios.find(s => s.id === selectedScenario)?.title}</strong> scenario. 
+                <h4 className="mb-4 text-3xl font-bold tracking-tight text-white">Initialize Model</h4>
+                <p className="mb-10 text-base leading-relaxed text-slate-400">
+                  Project the outcome of the <strong>{scenarios.find((scenario) => scenario.id === selectedScenario)?.title}</strong> scenario.
                   Calculated using verified census data and current polling weights.
                 </p>
-                <button 
+                <button
                   onClick={handleRun}
-                  className="bg-primary text-white px-10 py-4 rounded-xl font-bold shadow-[0_0_20px_rgba(0,229,255,0.3)] hover:scale-105 active:scale-95 transition-all text-lg"
+                  className="rounded-xl bg-primary px-10 py-4 text-lg font-bold text-white shadow-[0_0_20px_rgba(0,229,255,0.3)] transition-all hover:scale-105 active:scale-95"
                 >
                   Run Projection
                 </button>
               </div>
             )}
 
-            {/* Grounded Data Grid */}
-            <div className="mt-16 w-full grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {[
-                { label: 'Demographic Sync', value: 88 },
-                { label: 'Polling Latency', value: 12 },
-                { label: 'Historical Weight', value: 94 },
-                { label: 'Data Samples', value: 65 },
-                { label: 'Margin of Error', value: 41 },
-                { label: 'District Variance', value: 77 },
-              ].map((metric, i) => (
-                <div key={i} className="h-20 bg-white/5 rounded-2xl border border-white/5 p-4 flex flex-col justify-between group/metric hover:bg-white/10 transition-colors">
-                  <div className="flex justify-between items-center">
+            <div className="mt-16 grid w-full grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
+              {baselineMetrics.map((metric, index) => (
+                <div key={metric.label} className="group/metric flex h-20 flex-col justify-between rounded-2xl border border-white/5 bg-white/5 p-4 transition-colors hover:bg-white/10">
+                  <div className="flex items-center justify-between">
                     <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">{metric.label}</span>
-                    <span className="text-[9px] font-bold text-primary">{simulationRunning ? Math.floor(Math.random() * 100) : metric.value}%</span>
+                    <span className="text-[9px] font-bold text-primary">{liveMetrics[index]}%</span>
                   </div>
-                  <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                    <motion.div 
+                  <div className="h-1 w-full overflow-hidden rounded-full bg-white/5">
+                    <motion.div
                       initial={{ width: 0 }}
-                      animate={{ 
-                        width: `${metric.value}%`,
-                        x: simulationRunning ? ['-100%', '100%'] : '0%' 
+                      animate={{
+                        width: `${liveMetrics[index]}%`,
+                        x: simulationRunning ? ["-100%", "100%"] : "0%",
                       }}
-                      transition={{ 
-                        width: { duration: 1, delay: i * 0.1 },
-                        x: { duration: 1.5, repeat: Infinity, ease: "linear" }
+                      transition={{
+                        width: { duration: 1, delay: index * 0.1 },
+                        x: { duration: 1.5, repeat: Infinity, ease: "linear" },
                       }}
                       className="h-full bg-primary"
                     />
@@ -187,13 +228,13 @@ export const ElectionSimulations = () => {
             </div>
           </motion.div>
         ) : (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="glass-panel p-16 text-center flex flex-col items-center justify-center border-dashed border-white/10 rounded-[2rem]"
+            className="glass-panel flex flex-col items-center justify-center rounded-[2rem] border border-dashed border-white/10 p-16 text-center"
           >
-            <div className="text-6xl mb-8 grayscale opacity-20">📊</div>
-            <p className="text-xl font-medium text-slate-500 max-w-sm">
+            <div className="mb-8 text-6xl opacity-20 grayscale">AI</div>
+            <p className="max-w-sm text-xl font-medium text-slate-500">
               Select an impact scenario above to initialize the predictive projection engine.
             </p>
           </motion.div>

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -57,31 +58,38 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="flex h-screen w-full bg-background text-on-background font-body-md overflow-hidden">
       {/* SideNavBar */}
-      <nav className="bg-[#0A0E1A]/90 backdrop-blur-2xl text-blue-500 dark:text-blue-400 font-h1 antialiased border-r border-white/5 shadow-2xl flex flex-col h-full py-8 px-6 w-72 shrink-0 z-50">
-        <div className="flex items-center gap-4 mb-10 px-2 cursor-pointer" onClick={() => setActiveSection('home')}>
-          <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform">
-            <span className="material-symbols-outlined text-primary">account_balance</span>
+      <nav className="bg-[#0A0E1A]/90 backdrop-blur-2xl text-blue-500 dark:text-blue-400 font-h1 antialiased border-r border-white/5 shadow-2xl flex flex-col h-full py-10 px-8 w-80 shrink-0 z-50">
+        <div className="flex items-center gap-5 mb-12 px-2 cursor-pointer transition-opacity hover:opacity-80" onClick={() => setActiveSection('home')}>
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_20px_rgba(0,229,255,0.1)]">
+            <span className="material-symbols-outlined text-primary text-3xl">account_balance</span>
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white tracking-tight">Election AI Assistant</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary">Intelligence Portal</p>
+            <h1 className="text-lg font-bold text-white tracking-tight leading-tight">NeuroLearn AI<br/>Platform</h1>
+            <p className="text-[9px] uppercase tracking-[0.3em] text-primary mt-1 font-black opacity-70">Intelligence</p>
           </div>
         </div>
-        <div className="flex-1 space-y-2">
+        
+        <div className="flex-1 space-y-1.5">
           {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveSection(item.id)}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group ${
+              className={`w-full flex items-center gap-4 p-3.5 rounded-xl transition-all duration-300 group relative ${
                 activeSection === item.id
-                  ? "bg-primary/10 text-primary border-r-4 border-primary ring-1 ring-primary/20"
-                  : "text-slate-500 hover:bg-white/5 hover:translate-x-1"
+                  ? "bg-primary/10 text-primary"
+                  : "text-slate-500 hover:bg-white/5 hover:text-slate-300"
               }`}
             >
-              <span className={`material-symbols-outlined ${activeSection === item.id ? "fill-1" : ""}`}>
+              {activeSection === item.id && (
+                <motion.div 
+                  layoutId="active-nav"
+                  className="absolute left-0 w-1 h-6 bg-primary rounded-r-full"
+                />
+              )}
+              <span className={`material-symbols-outlined text-2xl transition-transform group-hover:scale-110 ${activeSection === item.id ? "fill-1" : ""}`}>
                 {item.icon}
               </span>
-              <span className="font-medium">{item.label}</span>
+              <span className="font-bold text-sm tracking-wide">{item.label}</span>
             </button>
           ))}
         </div>
@@ -100,42 +108,60 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden relative">
+      <main className="flex-1 flex flex-col overflow-hidden relative bg-[#020617]">
         {/* TopAppBar */}
-        <header className="bg-[#0A0E1A]/80 backdrop-blur-xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)] h-20 flex justify-between items-center w-full px-8 shrink-0 z-40">
-          <div className="flex items-center gap-6 flex-1">
-            <div className="relative w-full max-w-md">
-              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-              <input
-                className="w-full bg-surface-container-lowest border-none rounded-full py-2.5 pl-12 pr-4 text-body-md focus:ring-2 focus:ring-primary transition-all placeholder:text-slate-600 text-white"
-                placeholder="Search voting information, candidates, or deadlines..."
-                type="text"
-              />
-            </div>
-          </div>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-3">
-              <div className="text-right hidden sm:block">
-                <p className="font-h3 text-sm text-white leading-tight uppercase tracking-wide">
-                  {user ? user.displayName : "Guest User"}
-                </p>
-                <p className="text-[10px] text-primary uppercase tracking-wider font-bold">
-                  {user ? "Voter Account: Verified" : "Voter Status: Active"}
-                </p>
+        <header className="bg-[#0A0E1A]/60 backdrop-blur-3xl border-b border-white/5 h-20 flex justify-center items-center w-full px-12 shrink-0 z-40">
+          <div className="w-full max-w-[1400px] flex justify-between items-center gap-12">
+            <div className="flex items-center gap-6 flex-1 max-w-2xl">
+              <div className="relative w-full">
+                <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 text-xl">search</span>
+                <input
+                  className="w-full bg-white/5 border border-white/5 rounded-2xl py-3 pl-14 pr-6 text-sm focus:ring-2 focus:ring-primary/40 focus:bg-white/10 transition-all placeholder:text-slate-600 text-white outline-none"
+                  placeholder="Search intelligence database, learning modules, or polling analytics..."
+                  type="text"
+                />
               </div>
-              {user?.photoURL ? (
-                <img src={user.photoURL} alt="User" className="w-10 h-10 rounded-full border-2 border-primary/20" />
-              ) : (
-                <div className="w-10 h-10 rounded-full border-2 border-primary/20 bg-white/5 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-primary">person</span>
+            </div>
+            
+            <div className="flex items-center gap-8">
+              <div className="flex items-center gap-4 pr-4">
+                <button className="p-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all border border-white/5">
+                  <span className="material-symbols-outlined">notifications</span>
+                </button>
+              </div>
+              
+              <div className="flex items-center gap-4 pl-8 border-l border-white/5">
+                <div className="text-right hidden lg:block">
+                  <p className="font-bold text-sm text-white leading-none mb-1">
+                    {user ? user.displayName : "Guest Intelligence"}
+                  </p>
+                  <p className="text-[10px] text-primary uppercase tracking-[0.2em] font-black opacity-70">
+                    {user ? "Verified Agent" : "Anonymous Access"}
+                  </p>
                 </div>
-              )}
+                {user?.photoURL ? (
+                  <Image
+                    src={user.photoURL}
+                    alt="User"
+                    width={44}
+                    height={44}
+                    unoptimized
+                    className="h-11 w-11 rounded-2xl border border-primary/30 object-cover shadow-[0_0_15px_rgba(0,229,255,0.15)]"
+                  />
+                ) : (
+                  <div className="w-11 h-11 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-primary text-2xl">person</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </header>
 
-        <section className="flex-1 overflow-y-auto p-6 md:p-10 space-y-8 custom-scrollbar relative">
-          {children}
+        <section className="flex-1 overflow-y-auto custom-scrollbar relative">
+          <div className="max-w-[1400px] mx-auto p-8 md:p-12 space-y-10">
+            {children}
+          </div>
         </section>
 
         {/* FAB */}

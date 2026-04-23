@@ -1,10 +1,8 @@
 "use client";
 
-import { useAppStore } from "@/stores/useAppStore";
 import { motion } from "framer-motion";
 
 export function Analytics() {
-  const { setActiveSection } = useAppStore();
   const deadlines = [
     { date: "Oct 15", event: "Voter Registration Deadline", status: "Critical", color: "#FF3D00" },
     { date: "Oct 25", event: "Mail-in Ballot Request Ends", status: "Upcoming", color: "#00E5FF" },

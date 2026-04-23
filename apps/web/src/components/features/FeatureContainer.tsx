@@ -8,7 +8,7 @@ import ElectionQuiz from './quiz/ElectionQuiz';
 import { ChatAssistant } from './chat/ChatAssistant';
 import { ElectionSimulations } from './simulation/ElectionSimulations';
 import { PolicyDeepDive } from './guide/PolicyDeepDive';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const sectionMeta: Record<string, { title: string; subtitle: string }> = {
   timeline: { title: 'Election Timeline', subtitle: 'Follow key milestones from primaries to inauguration day' },

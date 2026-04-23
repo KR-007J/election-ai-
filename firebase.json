@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "neurolearn-ai-932b3e-f1028",
     "public": "apps/web/out",
     "ignore": [
       "firebase.json",
@@ -16,7 +17,7 @@
   "auth": {
     "providers": {
       "googleSignIn": {
-        "oAuthBrandDisplayName": "Election AI Assistant",
+        "oAuthBrandDisplayName": "NeuroLearn AI Platform",
         "supportEmail": "krishjoshikrishjoshi9@gmail.com"
       }
     }

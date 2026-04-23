@@ -6,7 +6,6 @@ import { VoterDatabase } from "@/components/features/voters/VoterDatabase";
 import { Analytics } from "@/components/features/analytics/Analytics";
 import { useAppStore } from "@/stores/useAppStore";
 import { AnimatePresence, motion } from "framer-motion";
-import { Timeline } from "@/components/features/timeline/Timeline";
 import { VoterGuide } from "@/components/features/guide/VoterGuide";
 import { ElectionSimulations } from "@/components/features/simulation/ElectionSimulations";
 import ElectionQuiz from "@/components/features/quiz/ElectionQuiz";

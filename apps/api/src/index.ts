@@ -1,189 +1,265 @@
-import Fastify from 'fastify';
-import cors from '@fastify/cors';
-import rateLimit from '@fastify/rate-limit';
-import dotenv from 'dotenv';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { z } from 'zod';
-import Redis from 'ioredis';
-import { Index } from '@upstash/vector';
+import Fastify from "fastify";
+import cors from "@fastify/cors";
+import rateLimit from "@fastify/rate-limit";
+import dotenv from "dotenv";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { z } from "zod";
+import Redis from "ioredis";
+import { Index } from "@upstash/vector";
+import { desc } from "drizzle-orm";
+import { db } from "./db";
+import * as schema from "./db/schema";
 
 dotenv.config();
 
 const fastify = Fastify({ logger: true });
 
-// Redis for Semantic Caching
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-  lazyConnect: true,
-  maxRetriesPerRequest: 1
+const env = {
+  port: Number.parseInt(process.env.PORT ?? "3001", 10),
+  redisUrl: process.env.REDIS_URL,
+  geminiApiKey: process.env.GEMINI_API_KEY,
+  vectorUrl: process.env.UPSTASH_VECTOR_REST_URL,
+  vectorToken: process.env.UPSTASH_VECTOR_REST_TOKEN,
+};
+
+const chatSchema = z.object({
+  message: z.string().trim().min(1).max(4000),
+  history: z
+    .array(
+      z.object({
+        role: z.enum(["user", "model"]),
+        parts: z.array(z.object({ text: z.string() })),
+      }),
+    )
+    .max(30)
+    .optional(),
 });
 
-redis.on('error', (err) => {
-  fastify.log.warn('Redis Connection Error: ' + err.message);
-});
+const fallbackUpdates = [
+  {
+    title: "Registration deadline approaching",
+    category: "Deadline",
+    time: "2h ago",
+    urgent: true,
+    description: "Review registration status and polling information before your state deadline.",
+    icon: "event_busy",
+  },
+  {
+    title: "Polling locations refreshed",
+    category: "Update",
+    time: "5h ago",
+    urgent: false,
+    description: "Three district facilities added to the early-voting directory.",
+    icon: "location_on",
+  },
+];
 
-// Upstash Vector for RAG
-const vectorIndex = new Index({
-  url: process.env.UPSTASH_VECTOR_REST_URL || 'https://mock.upstash.io',
-  token: process.env.UPSTASH_VECTOR_REST_TOKEN || 'mock-token',
-});
-
-// Register Plugins
-fastify.register(cors, { origin: '*' });
-fastify.register(rateLimit, { max: 100, timeWindow: '1 minute' });
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-
-const ChatSchema = z.object({
-  message: z.string().min(1),
-  history: z.array(z.object({
-    role: z.enum(['user', 'model']),
-    parts: z.array(z.object({ text: z.string() }))
-  })).optional(),
-});
+const fallbackVoters = [
+  {
+    id: 1,
+    name: "Arthur Vance",
+    email: "vance@electionassistance.gov",
+    status: "Registered",
+    sentiment: "Positive",
+    location: "District 12",
+    lastActive: new Date(),
+  },
+  {
+    id: 2,
+    name: "Sloane Reyes",
+    email: "reyes.s@electionassistance.gov",
+    status: "Pending",
+    sentiment: "Neutral",
+    location: "District 4",
+    lastActive: new Date(),
+  },
+];
 
 const getSystemInstruction = (context: string) => `
 You are ElectIQ, a non-partisan AI election assistant.
-Your goal is to provide accurate, unbiased, and factual information about the U.S. election process, candidates, and voting requirements.
+Provide accurate, balanced, factual election help.
 
-CRITICAL GUIDELINES:
-1. NEVER express a political preference or endorse any candidate or party.
-2. If asked for an opinion on a candidate, provide balanced information based on their official platforms and public records.
-3. Prioritize information about deadlines, registration, and polling locations.
-4. You can guide users to specific app sections: "Timeline" for milestones, "Voter Guide" for prep, "Simulations" for interactive scenarios, and "Deep Dives" for policy comparisons.
-5. Use clear, accessible language.
-6. If you don't know an answer for certain, suggest checking official government sources like vote.gov or state election websites.
-7. Keep responses concise and helpful.
-8. Avoid engaging in inflammatory or divisive rhetoric.
+Rules:
+1. Never endorse a candidate or party.
+2. Keep answers concise and practical.
+3. Prefer registration, deadlines, voting access, and official process information.
+4. If uncertain, direct users to official election sources such as vote.gov or state sites.
+5. Avoid inflammatory rhetoric.
 
-CONTEXT TO USE FOR ANSWERING (if relevant):
-${context}
+Useful app sections:
+- Timeline for milestones
+- Voter Guide for preparation
+- Simulations for scenarios
+- Deep Dives for issue comparisons
+
+Relevant context:
+${context || "No additional context supplied."}
 `;
 
-import { db } from './db';
-import * as schema from './db/schema';
-import { desc } from 'drizzle-orm';
+const redis = env.redisUrl
+  ? new Redis(env.redisUrl, {
+      lazyConnect: true,
+      maxRetriesPerRequest: 1,
+    })
+  : null;
 
-fastify.post('/chat', async (request, reply) => {
+redis?.on("error", (error) => {
+  fastify.log.warn(`Redis error: ${error.message}`);
+});
+
+const vectorIndex =
+  env.vectorUrl && env.vectorToken
+    ? new Index({
+        url: env.vectorUrl,
+        token: env.vectorToken,
+      })
+    : null;
+
+const genAI = env.geminiApiKey ? new GoogleGenerativeAI(env.geminiApiKey) : null;
+
+fastify.register(cors, { origin: true });
+fastify.register(rateLimit, { max: 100, timeWindow: "1 minute" });
+
+fastify.get("/health", async () => ({
+  status: "ok",
+  aiConfigured: Boolean(genAI),
+  vectorConfigured: Boolean(vectorIndex),
+  cacheConfigured: Boolean(redis),
+  timestamp: new Date().toISOString(),
+}));
+
+fastify.post("/chat", async (request, reply) => {
   try {
-    const { message, history } = ChatSchema.parse(request.body);
+    const { message, history } = chatSchema.parse(request.body);
 
-    const cacheKey = `chat:cache:${Buffer.from(message).toString('base64').slice(0, 50)}`;
-    let cachedResponse = null;
-    try {
-      cachedResponse = await redis.get(cacheKey);
-    } catch (e) {
-      fastify.log.warn('Redis Cache Get Failed: ' + e);
+    if (!genAI) {
+      return reply.status(503).send({
+        error: "AI backend is not configured.",
+        text: "Assistant is offline until `GEMINI_API_KEY` is configured.",
+      });
     }
 
+    const cacheKey = `chat:${Buffer.from(message).toString("base64url").slice(0, 80)}`;
+    const cachedResponse = redis ? await redis.get(cacheKey).catch(() => null) : null;
+
     if (cachedResponse) {
-      fastify.log.info('Cache hit for: ' + message);
       return { text: cachedResponse, cached: true };
     }
 
     let ragContext = "";
-    try {
-      if (process.env.UPSTASH_VECTOR_REST_URL) {
-        const queryResult = await vectorIndex.query({
+    if (vectorIndex) {
+      try {
+        const matches = await vectorIndex.query({
           data: message,
           topK: 3,
           includeMetadata: true,
         });
 
-        if (queryResult && queryResult.length > 0) {
-          ragContext = queryResult
-            .map(match => match.metadata?.text || '')
-            .filter(text => text)
-            .join('\n\n');
-        }
+        ragContext = matches
+          .map((match) => (typeof match.metadata?.text === "string" ? match.metadata.text : ""))
+          .filter(Boolean)
+          .join("\n\n");
+      } catch (error) {
+        fastify.log.warn({ error }, "Vector query failed");
       }
-    } catch (e) {
-      fastify.log.warn('Vector Search Failed: ' + e);
     }
 
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
-      systemInstruction: getSystemInstruction(ragContext)
+      systemInstruction: getSystemInstruction(ragContext),
     });
 
-    const chat = model.startChat({
-      history: history || [],
-    });
-
+    const chat = model.startChat({ history: history ?? [] });
     const result = await chat.sendMessage(message);
-    const response = await result.response;
-    const text = response.text();
+    const text = result.response.text();
 
-    try {
-      await redis.set(cacheKey, text, 'EX', 3600);
-    } catch (e) {
-      fastify.log.warn('Redis Cache Set Failed: ' + e);
+    if (redis) {
+      await redis.set(cacheKey, text, "EX", 3600).catch((error) => {
+        fastify.log.warn({ error }, "Redis cache set failed");
+      });
     }
 
     return { text, cached: false };
   } catch (error) {
     fastify.log.error(error);
     if (error instanceof z.ZodError) {
-      return reply.status(400).send({ error: 'Invalid request body', details: error.errors });
+      return reply.status(400).send({ error: "Invalid request body", details: error.errors });
     }
-    return reply.status(500).send({ error: 'Internal Server Error' });
+    return reply.status(500).send({ error: "Internal server error" });
   }
 });
 
-fastify.get('/voters', async () => {
+fastify.get("/voters", async () => {
   try {
     return await db.select().from(schema.voters).orderBy(desc(schema.voters.lastActive));
-  } catch (e) {
-    fastify.log.error(e);
-    return [
-      { id: 1, name: "Arthur Vance", email: "vance@electionassistance.gov", status: "Registered", sentiment: "Positive", location: "District 12", lastActive: new Date() },
-      { id: 2, name: "Sloane Reyes", email: "reyes.s@electionassistance.gov", status: "Pending", sentiment: "Neutral", location: "District 4", lastActive: new Date() },
-    ];
+  } catch (error) {
+    fastify.log.warn({ error }, "Falling back to local voters");
+    return fallbackVoters;
   }
 });
 
-fastify.post('/voters', async (request) => {
-  const voter = request.body as any;
+fastify.post("/voters", async (request, reply) => {
+  const voterSchema = z.object({
+    name: z.string().min(1),
+    email: z.string().email().optional(),
+    status: z.string().optional(),
+    sentiment: z.string().optional(),
+    location: z.string().optional(),
+  });
+
   try {
+    const voter = voterSchema.parse(request.body);
     return await db.insert(schema.voters).values(voter).returning();
-  } catch (e) {
-    fastify.log.error(e);
-    return { ...voter, id: Math.random() };
+  } catch (error) {
+    fastify.log.warn({ error }, "Persisting voter failed");
+    if (error instanceof z.ZodError) {
+      return reply.status(400).send({ error: "Invalid voter payload", details: error.errors });
+    }
+    return [{ id: Date.now(), ...(request.body as Record<string, unknown>) }];
   }
 });
 
-fastify.get('/updates', async () => {
+fastify.get("/updates", async () => {
+  if (!genAI) {
+    return fallbackUpdates;
+  }
+
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const prompt = `Generate 4 realistic, official-style election bulletins for a "Voter Assistance Portal". 
-    Focus on registration deadlines, polling location updates, early voting dates, and non-partisan voter education info. 
-    Include specific details like district numbers or office locations. 
-    Format ONLY as a JSON array of objects with keys: title, description, time (e.g. "2 mins ago"), and icon (material symbol name).`;
-    
-    const result = await model.generateContent(prompt);
-    const text = result.response.text().replace(/```json|```/g, '').trim();
-    return JSON.parse(text);
-  } catch (e) {
-    fastify.log.error(e);
-    return [
-      { title: "Mass SMS Campaign Completed", description: "Target: District 12 | 84% Read Rate", time: "2 mins ago", icon: "mail" },
-      { title: "Anomalous Voter Flux Detected", description: "Sector 4, Zone B | High Variance", time: "15 mins ago", icon: "report" },
-    ];
-  }
-});
+    const prompt = `Generate 4 realistic, non-partisan election portal updates.
+Return only valid JSON as an array of objects with:
+title, category, time, urgent, description, icon.`;
 
-fastify.get('/health', async () => {
-  return { status: 'ok', timestamp: new Date().toISOString() };
+    const result = await model.generateContent(prompt);
+    const rawText = result.response.text().replace(/```json|```/g, "").trim();
+    const parsed = z
+      .array(
+        z.object({
+          title: z.string(),
+          category: z.string(),
+          time: z.string(),
+          urgent: z.boolean(),
+          description: z.string(),
+          icon: z.string(),
+        }),
+      )
+      .parse(JSON.parse(rawText));
+
+    return parsed;
+  } catch (error) {
+    fastify.log.warn({ error }, "Falling back to local updates");
+    return fallbackUpdates;
+  }
 });
 
 const start = async () => {
   try {
-    const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
-    await fastify.listen({ port, host: '0.0.0.0' });
-    console.log(`🚀 ElectIQ API running on http://localhost:${port}`);
-  } catch (err) {
-    fastify.log.error(err);
+    await fastify.listen({ port: env.port, host: "0.0.0.0" });
+    fastify.log.info(`ElectIQ API running on http://localhost:${env.port}`);
+  } catch (error) {
+    fastify.log.error(error);
     process.exit(1);
   }
 };
 
-start();
+void start();

@@ -68,7 +68,7 @@ export default function ElectionQuiz() {
           </div>
         </div>
         <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-          <motion.div 
+          <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             className="h-full bg-primary shadow-[0_0_15px_rgba(0,229,255,0.5)]"
@@ -90,14 +90,14 @@ export default function ElectionQuiz() {
               <h2 className="text-3xl font-bold text-white mb-10 leading-tight">
                 {questions[currentStep].text}
               </h2>
-              
+
               <div className="grid grid-cols-1 gap-4">
-                {questions[currentStep].options.map((option, i) => (
+                {questions[currentStep].options.map((option, index) => (
                   <motion.button
                     key={option.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
+                    transition={{ delay: index * 0.1 }}
                     onClick={() => handleAnswer(option.id)}
                     className="group flex items-center justify-between p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/50 hover:bg-primary/10 transition-all text-left"
                   >
@@ -118,11 +118,11 @@ export default function ElectionQuiz() {
             className="text-center py-12"
           >
             <div className="w-24 h-24 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center text-4xl mx-auto mb-8 shadow-[0_0_40px_rgba(34,197,94,0.2)]">
-              ✨
+              OK
             </div>
             <h2 className="text-4xl font-bold text-white mb-4">Profile Generated</h2>
-            <p className="text-slate-400 text-lg mb-12 max-w-md mx-auto">
-              We've analyzed your responses. Your voter profile is now calibrated to show the most relevant candidates and issues.
+            <p className="text-slate-400 text-lg mb-12 max-w-[480px] mx-auto">
+              We&apos;ve analyzed your responses. Your voter profile is now calibrated to show the most relevant candidates and issues.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -140,13 +140,13 @@ export default function ElectionQuiz() {
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 justify-center">
-              <button 
+              <button
                 onClick={() => setActiveSection('candidates')}
                 className="bg-primary text-white px-10 py-4 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all text-lg"
               >
                 View Matched Candidates
               </button>
-              <button 
+              <button
                 onClick={() => { setIsFinished(false); setCurrentStep(0); setAnswers({}); }}
                 className="bg-white/5 text-white px-10 py-4 rounded-2xl font-bold border border-white/10 hover:bg-white/10 transition-all"
               >

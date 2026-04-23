@@ -13,8 +13,8 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Election AI Assistant | Intelligence Command",
-  description: "Next-generation intelligence for election analysis and voter engagement.",
+  title: "NeuroLearn AI | Intelligence Command",
+  description: "Next-generation intelligence for specialized learning and data engagement.",
 };
 
 export default function RootLayout({
@@ -24,9 +24,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <head>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" />
-      </head>
       <body className={`${spaceGrotesk.variable} ${manrope.variable} bg-background text-on-background font-body-md antialiased`}>
         {children}
       </body>
