@@ -58,7 +58,7 @@ export function DashboardHome() {
               animate={{ opacity: 1, y: 0 }}
               className="font-h1 text-4xl md:text-5xl text-white mb-4 tracking-tight"
             >
-              Ready to Vote, <span className="text-primary italic">Citizen?</span>
+              Welcome to <span className="text-primary italic">NeuroLearn AI</span>
             </motion.h1>
             <p className="text-slate-400 text-lg max-w-xl leading-relaxed">
               Your centralized dashboard for verified election information, candidate tracking, and polling logistics.

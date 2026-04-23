@@ -4,7 +4,7 @@ import React from 'react';
 import { useAppStore } from '@/stores/useAppStore';
 import { Timeline } from './timeline/Timeline';
 import { VoterGuide } from './guide/VoterGuide';
-import { ElectionQuiz } from './quiz/ElectionQuiz';
+import ElectionQuiz from './quiz/ElectionQuiz';
 import { ChatAssistant } from './chat/ChatAssistant';
 import { ElectionSimulations } from './simulation/ElectionSimulations';
 import { PolicyDeepDive } from './guide/PolicyDeepDive';

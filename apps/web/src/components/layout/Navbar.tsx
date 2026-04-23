@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppStore } from '@/stores/useAppStore';
+import { useAppStore, type Section } from '@/stores/useAppStore';
 import { motion } from 'framer-motion';
 import {
   SignInButton,
@@ -57,7 +57,7 @@ export const Navbar = () => {
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveSection(tab.id)}
+                onClick={() => setActiveSection(tab.id as Section)}
                 className="relative px-7 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all hover:text-white group whitespace-nowrap"
                 style={{
                   color: activeSection === tab.id ? '#fff' : 'rgba(255, 255, 255, 0.4)',
@@ -122,7 +122,7 @@ export const Navbar = () => {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveSection(tab.id)}
+              onClick={() => setActiveSection(tab.id as Section)}
               className="flex flex-col items-center justify-center gap-1.5 min-w-[56px] relative group"
             >
               <div 

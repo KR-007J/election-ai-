@@ -14,8 +14,8 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Election Assistance | Election Command",
-  description: "Precision intelligence for targeted outreach campaigns.",
+  title: "NeuroLearn AI | Intelligence Command",
+  description: "Next-generation intelligence for election analysis and voter engagement.",
 };
 
 export default function RootLayout({
