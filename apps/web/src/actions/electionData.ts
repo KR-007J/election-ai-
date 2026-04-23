@@ -1,9 +1,3 @@
-"use server";
-
-import { db } from "@/db";
-import { timelineEvents, voterGuideSteps, quizQuestions } from "@/db/schema";
-import { eq } from "drizzle-orm";
-
 const MOCK_TIMELINE = [
   {
     id: 1,
@@ -21,7 +15,6 @@ const MOCK_TIMELINE = [
     ],
     tags: ['FEC Filing', 'Exploratory Committee', 'Campaign Finance'],
   },
-  // Full data would be populated in DB
 ];
 
 const MOCK_GUIDE = [
@@ -35,6 +28,7 @@ const MOCK_GUIDE = [
       'You must be a U.S. citizen (natural born or naturalized)',
       'You must be at least 18 years old by Election Day',
       'You must be a resident of the state where you\'re registering',
+      'You must not be currently serving a felony sentence (varies by state)',
     ],
     tip: '💡 <strong>Tip:</strong> Some states allow 17-year-olds to vote in primaries if they will be 18 by the general election.',
   }
@@ -55,31 +49,13 @@ const MOCK_QUIZ = [
 ];
 
 export async function getTimelineEvents() {
-  try {
-    if (!process.env.DATABASE_URL) return MOCK_TIMELINE;
-    const events = await db.select().from(timelineEvents);
-    return events.length > 0 ? events : MOCK_TIMELINE;
-  } catch (error) {
-    return MOCK_TIMELINE;
-  }
+  return MOCK_TIMELINE;
 }
 
 export async function getVoterGuideSteps() {
-  try {
-    if (!process.env.DATABASE_URL) return MOCK_GUIDE;
-    const steps = await db.select().from(voterGuideSteps);
-    return steps.length > 0 ? steps : MOCK_GUIDE;
-  } catch (error) {
-    return MOCK_GUIDE;
-  }
+  return MOCK_GUIDE;
 }
 
 export async function getQuizQuestions() {
-  try {
-    if (!process.env.DATABASE_URL) return MOCK_QUIZ;
-    const questions = await db.select().from(quizQuestions);
-    return questions.length > 0 ? questions : MOCK_QUIZ;
-  } catch (error) {
-    return MOCK_QUIZ;
-  }
+  return MOCK_QUIZ;
 }

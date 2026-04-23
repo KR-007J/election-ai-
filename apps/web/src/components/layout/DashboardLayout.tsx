@@ -3,7 +3,6 @@
 import React from "react";
 import { useAppStore, type Section } from "@/stores/useAppStore";
 import { motion } from "framer-motion";
-import { UserButton, useUser } from "@clerk/nextjs";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -11,7 +10,7 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { activeSection, setActiveSection } = useAppStore();
-  const { user } = useUser();
+  // Removed Clerk useUser for static build compatibility
 
   const navItems = [
     { id: "home" as Section, icon: "dashboard", label: "Overview" },
@@ -80,16 +79,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="h-8 w-[1px] bg-white/10"></div>
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
-                <p className="font-h3 text-sm text-white leading-tight uppercase tracking-wide">{user?.fullName || "Citizen User"}</p>
+                <p className="font-h3 text-sm text-white leading-tight uppercase tracking-wide">Guest User</p>
                 <p className="text-[10px] text-primary uppercase tracking-wider font-bold">Voter Status: Active</p>
               </div>
-              <UserButton 
-                appearance={{
-                  elements: {
-                    userButtonAvatarBox: "w-10 h-10 rounded-full border-2 border-primary/20",
-                  }
-                }}
-              />
+              <div className="w-10 h-10 rounded-full border-2 border-primary/20 bg-white/5 flex items-center justify-center">
+                <span className="material-symbols-outlined text-primary">person</span>
+              </div>
             </div>
           </div>
         </header>

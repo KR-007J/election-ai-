@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Manrope } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -24,16 +23,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en" className="dark">
-        <head>
-          <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" />
-        </head>
-        <body className={`${spaceGrotesk.variable} ${manrope.variable} bg-background text-on-background font-body-md antialiased`}>
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" className="dark">
+      <head>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" />
+      </head>
+      <body className={`${spaceGrotesk.variable} ${manrope.variable} bg-background text-on-background font-body-md antialiased`}>
+        {children}
+      </body>
+    </html>
   );
 }
-
