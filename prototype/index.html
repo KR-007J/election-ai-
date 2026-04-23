@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ElectIQ — Your Election Intelligence Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/timeline.css" />
+  <link rel="stylesheet" href="css/chat.css" />
+  <link rel="stylesheet" href="css/quiz.css" />
+</head>
+<body>
+  <div id="cursor-glow"></div>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <div class="nav-logo">
+      <span class="logo-icon">⬡</span>
+      <span class="logo-text">Elect<span class="accent">IQ</span></span>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-section="home">Home</button>
+      <button class="nav-tab" data-section="timeline">Timeline</button>
+      <button class="nav-tab" data-section="guide">Guide</button>
+      <button class="nav-tab" data-section="quiz">Quiz</button>
+      <button class="nav-tab" data-section="chat">AI Chat</button>
+    </div>
+    <div class="nav-badge">
+      <span class="badge-dot"></span>
+      <span>Live 2026</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="section active" id="section-home">
+    <div class="hero">
+      <div class="hero-bg-grid"></div>
+      <div class="hero-content">
+        <div class="hero-eyebrow">Powered by AI · Built for Citizens</div>
+        <h1 class="hero-title">
+          Understand<br/>
+          <span class="title-accent">Every Vote.</span><br/>
+          Every Step.
+        </h1>
+        <p class="hero-sub">ElectIQ demystifies the election process with interactive timelines, step-by-step guides, and an AI assistant available 24/7 to answer your civic questions.</p>
+        <div class="hero-cta">
+          <button class="btn-primary" onclick="switchSection('timeline')">Explore Timeline</button>
+          <button class="btn-ghost" onclick="switchSection('chat')">Ask AI Assistant →</button>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><span class="stat-num">12</span><span class="stat-label">Election Stages</span></div>
+          <div class="stat"><span class="stat-num">50+</span><span class="stat-label">FAQ Answered</span></div>
+          <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Non-Partisan</span></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="ballot-card">
+          <div class="ballot-header">OFFICIAL BALLOT</div>
+          <div class="ballot-line"></div>
+          <div class="ballot-option selected">◉ CANDIDATE A</div>
+          <div class="ballot-option">○ CANDIDATE B</div>
+          <div class="ballot-option">○ CANDIDATE C</div>
+          <div class="ballot-stamp">✓ VERIFIED</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FEATURE CARDS -->
+    <div class="features">
+      <div class="feature-card" onclick="switchSection('timeline')">
+        <div class="feature-icon">📅</div>
+        <h3>Election Timeline</h3>
+        <p>Interactive visual timeline from candidate filing to inauguration. Click each phase to learn more.</p>
+        <span class="feature-arrow">→</span>
+      </div>
+      <div class="feature-card" onclick="switchSection('guide')">
+        <div class="feature-icon">📋</div>
+        <h3>Step-by-Step Guide</h3>
+        <p>From voter registration to casting your ballot — every step explained clearly and simply.</p>
+        <span class="feature-arrow">→</span>
+      </div>
+      <div class="feature-card" onclick="switchSection('quiz')">
+        <div class="feature-icon">🧠</div>
+        <h3>Civics Quiz</h3>
+        <p>Test your election knowledge with our adaptive quiz engine. Learn as you play.</p>
+        <span class="feature-arrow">→</span>
+      </div>
+      <div class="feature-card" onclick="switchSection('chat')">
+        <div class="feature-icon">🤖</div>
+        <h3>AI Assistant</h3>
+        <p>Ask anything about elections, voting rights, or civic processes — get instant, accurate answers.</p>
+        <span class="feature-arrow">→</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="section" id="section-timeline">
+    <div class="section-header">
+      <h2 class="section-title">Election <span class="accent">Timeline</span></h2>
+      <p class="section-sub">The complete lifecycle of a U.S. presidential election — click any phase to expand details.</p>
+    </div>
+    <div class="timeline-container" id="timeline-container">
+      <!-- Populated by JS -->
+    </div>
+  </section>
+
+  <!-- GUIDE -->
+  <section class="section" id="section-guide">
+    <div class="section-header">
+      <h2 class="section-title">Voter <span class="accent">Guide</span></h2>
+      <p class="section-sub">Everything you need to know to participate in the democratic process.</p>
+    </div>
+    <div class="guide-layout">
+      <div class="guide-sidebar" id="guide-sidebar">
+        <!-- Steps populated by JS -->
+      </div>
+      <div class="guide-detail" id="guide-detail">
+        <!-- Detail populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="section" id="section-quiz">
+    <div class="section-header">
+      <h2 class="section-title">Civics <span class="accent">Quiz</span></h2>
+      <p class="section-sub">Test your knowledge of the election process.</p>
+    </div>
+    <div class="quiz-container" id="quiz-container">
+      <!-- Populated by JS -->
+    </div>
+  </section>
+
+  <!-- CHAT -->
+  <section class="section" id="section-chat">
+    <div class="section-header">
+      <h2 class="section-title">AI Election <span class="accent">Assistant</span></h2>
+      <p class="section-sub">Ask any question about elections, voting rights, or the democratic process.</p>
+    </div>
+    <div class="chat-layout">
+      <div class="chat-window" id="chat-window">
+        <div class="chat-messages" id="chat-messages">
+          <div class="chat-msg assistant">
+            <div class="msg-avatar">⬡</div>
+            <div class="msg-bubble">
+              <p>Hello! I'm your Election Intelligence Assistant. I can help you understand:</p>
+              <ul>
+                <li>How to register to vote</li>
+                <li>Election timelines and key dates</li>
+                <li>How votes are counted</li>
+                <li>Your voting rights</li>
+                <li>How different electoral systems work</li>
+              </ul>
+              <p>What would you like to know?</p>
+            </div>
+          </div>
+        </div>
+        <div class="chat-suggestions" id="chat-suggestions">
+          <button class="suggestion-pill" onclick="sendSuggestion(this)">How do I register to vote?</button>
+          <button class="suggestion-pill" onclick="sendSuggestion(this)">What happens on Election Day?</button>
+          <button class="suggestion-pill" onclick="sendSuggestion(this)">How are votes counted?</button>
+          <button class="suggestion-pill" onclick="sendSuggestion(this)">What is the Electoral College?</button>
+        </div>
+        <div class="chat-input-area">
+          <textarea id="chat-input" class="chat-input" placeholder="Ask about elections, voting, or civic processes..." rows="1"></textarea>
+          <button class="chat-send" id="chat-send" onclick="sendMessage()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="chat-info-panel">
+        <div class="info-card">
+          <h4>🔒 Non-Partisan</h4>
+          <p>ElectIQ provides factual, non-partisan information about the election process. We don't endorse any candidate or party.</p>
+        </div>
+        <div class="info-card">
+          <h4>📚 Verified Sources</h4>
+          <p>Answers are based on official government sources, election law, and civic education materials.</p>
+        </div>
+        <div class="info-card">
+          <h4>🌍 All Elections</h4>
+          <p>Ask about federal, state, and local elections. We cover primaries, generals, referendums, and more.</p>
+        </div>
+        <div class="popular-topics">
+          <h4>Popular Topics</h4>
+          <div class="topic-tags">
+            <span class="topic-tag" onclick="sendSuggestion(this)">Absentee Voting</span>
+            <span class="topic-tag" onclick="sendSuggestion(this)">Early Voting</span>
+            <span class="topic-tag" onclick="sendSuggestion(this)">Voter ID Laws</span>
+            <span class="topic-tag" onclick="sendSuggestion(this)">Redistricting</span>
+            <span class="topic-tag" onclick="sendSuggestion(this)">Primaries vs General</span>
+            <span class="topic-tag" onclick="sendSuggestion(this)">Electoral College</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="data/electionData.js"></script>
+  <script src="js/timeline.js"></script>
+  <script src="js/guide.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

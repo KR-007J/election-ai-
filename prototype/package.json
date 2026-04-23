@@ -1,0 +1,40 @@
+{
+  "name": "electiq-election-assistant",
+  "version": "1.0.0",
+  "description": "AI-powered interactive election education platform — Google Hackathon 2026",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "dev": "npx serve . --port 3000",
+    "lint": "echo 'No build step required — pure web platform'"
+  },
+  "keywords": [
+    "election",
+    "civic-education",
+    "democracy",
+    "voting",
+    "ai-assistant",
+    "anthropic",
+    "hackathon",
+    "interactive",
+    "non-partisan"
+  ],
+  "author": "ElectIQ Team",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-team/electiq"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions",
+    "last 2 Edge versions"
+  ]
+}
