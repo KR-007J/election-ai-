@@ -144,6 +144,31 @@ body {
   background: rgba(0, 220, 229, 0.2);
 }
 
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 229, 255, 0.2) transparent;
+}
+
+/* Hide Clerk Keyless Prompt and Next.js Overlay */
+#clerk-keyless-prompt,
+[data-nextjs-dialog-overlay],
+[data-nextjs-toast-wrapper],
+[data-nextjs-feedback-button],
+.cl-internal-phkr6m,
+.cl-internal-1dauv9w,
+.cl-internal-f6yba9,
+.cl-internal-1dauv9w,
+#__next-build-watcher,
+#nextjs__container_build_error_label,
+#nextjs__container_errors_label {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  opacity: 0 !important;
+}
+
 @keyframes pulse-cyan {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(0.9); }

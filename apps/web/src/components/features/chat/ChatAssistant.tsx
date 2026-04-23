@@ -44,7 +44,7 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
       }
     } catch (error) {
       console.error('Chat Error:', error);
-      addMessage({ role: 'model', text: 'Connection lost. Please ensure the API is running.' });
+      addMessage({ role: 'model', text: 'Assistant is currently offline or API keys are not configured. Please check your .env settings.' });
     } finally {
       setIsLoading(false);
     }

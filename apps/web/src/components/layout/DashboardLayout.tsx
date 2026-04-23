@@ -54,8 +54,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </button>
           ))}
         </div>
-        <div className="mt-auto pt-6 space-y-4 border-t border-white/5">
-        </div>
+          <div className="text-[10px] uppercase tracking-widest text-slate-500 font-bold px-2 py-4">
+            Developed by <span className="text-primary">Krish Joshi</span> & Partner <span className="text-primary">Antigravity</span>
+          </div>
       </nav>
 
       {/* Main Content */}
@@ -74,18 +75,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-4 text-slate-400">
-              <button 
-                onClick={() => setActiveSection('chat')}
-                className="material-symbols-outlined hover:text-primary transition-all duration-300 scale-95 active:opacity-80"
-              >
-                support_agent
-              </button>
-              <button 
-                onClick={() => setActiveSection('settings')} 
-                className="material-symbols-outlined hover:text-primary transition-all duration-300 scale-95 active:opacity-80"
-              >
-                settings
-              </button>
+              {/* Removed support_agent and settings per user request */}
             </div>
             <div className="h-8 w-[1px] bg-white/10"></div>
             <div className="flex items-center gap-3">
