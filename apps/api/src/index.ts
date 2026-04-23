@@ -58,26 +58,26 @@ const fallbackVoters = [
   {
     id: 1,
     name: "Arthur Vance",
-    email: "vance@electionassistance.gov",
-    status: "Registered",
+    email: "vance@neurolearn.ai",
+    status: "Active",
     sentiment: "Positive",
-    location: "District 12",
+    location: "Module A",
     lastActive: new Date(),
   },
   {
     id: 2,
     name: "Sloane Reyes",
-    email: "reyes.s@electionassistance.gov",
+    email: "reyes.s@neurolearn.ai",
     status: "Pending",
     sentiment: "Neutral",
-    location: "District 4",
+    location: "Module B",
     lastActive: new Date(),
   },
 ];
 
 const getSystemInstruction = (context: string) => `
-You are ElectIQ, a non-partisan AI election assistant.
-Provide accurate, balanced, factual election help.
+You are NeuroLearn AI, a non-partisan specialized intelligence assistant.
+Provide accurate, balanced, factual information help.
 
 Rules:
 1. Never endorse a candidate or party.
@@ -226,7 +226,7 @@ fastify.get("/updates", async () => {
 
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const prompt = `Generate 4 realistic, non-partisan election portal updates.
+    const prompt = `Generate 4 realistic, non-partisan intelligence portal updates.
 Return only valid JSON as an array of objects with:
 title, category, time, urgent, description, icon.`;
 
@@ -255,7 +255,7 @@ title, category, time, urgent, description, icon.`;
 const start = async () => {
   try {
     await fastify.listen({ port: env.port, host: "0.0.0.0" });
-    fastify.log.info(`ElectIQ API running on http://localhost:${env.port}`);
+    fastify.log.info(`NeuroLearn AI API running on http://localhost:${env.port}`);
   } catch (error) {
     fastify.log.error(error);
     process.exit(1);
