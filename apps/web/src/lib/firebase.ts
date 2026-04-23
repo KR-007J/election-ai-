@@ -1,6 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
+
 const firebaseConfig = {
   apiKey: "AIzaSyAuevfgjcomG1vdUJ7oH73Za09n_kPwX38",
   authDomain: "neurolearn-ai-krish-3244.firebaseapp.com",
@@ -12,6 +14,8 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const googleProvider = new GoogleAuthProvider();
 
 // Initialize Analytics conditionally (only in browser)
 export const initAnalytics = async () => {

@@ -13,7 +13,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "NeuroLearn AI | Intelligence Command",
+  title: "Election AI Assistant | Intelligence Command",
   description: "Next-generation intelligence for election analysis and voter engagement.",
 };
 

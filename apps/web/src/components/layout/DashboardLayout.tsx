@@ -1,8 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useAppStore, type Section } from "@/stores/useAppStore";
 import { motion } from "framer-motion";
+import { auth } from "@/lib/firebase";
+import { onAuthStateChanged, signOut, User } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -10,7 +13,28 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { activeSection, setActiveSection } = useAppStore();
-  // Removed Clerk useUser for static build compatibility
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
+        setUser(null);
+        // Optional: Redirect to login if not already there
+        // router.push("/login"); 
+      }
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, [router]);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push("/login");
+  };
 
   const navItems = [
     { id: "home" as Section, icon: "dashboard", label: "Overview" },
@@ -22,6 +46,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     { id: "settings" as Section, icon: "settings", label: "Preferences" },
   ];
 
+  if (loading) {
+    return (
+      <div className="h-screen w-full bg-[#020617] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen w-full bg-background text-on-background font-body-md overflow-hidden">
       {/* SideNavBar */}
@@ -31,7 +63,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <span className="material-symbols-outlined text-primary">account_balance</span>
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white tracking-tight">NeuroLearn AI</h1>
+            <h1 className="text-xl font-bold text-white tracking-tight">Election AI Assistant</h1>
             <p className="text-[10px] uppercase tracking-[0.2em] text-primary">Intelligence Portal</p>
           </div>
         </div>
@@ -53,9 +85,18 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </button>
           ))}
         </div>
-          <div className="text-[10px] uppercase tracking-widest text-slate-500 font-bold px-2 py-4">
-            Developed by <span className="text-primary">Krish Joshi</span> & Partner <span className="text-primary">Antigravity</span>
-          </div>
+
+        <button 
+          onClick={handleLogout}
+          className="mt-4 w-full flex items-center gap-3 p-3 rounded-xl text-red-400/60 hover:bg-red-500/10 hover:text-red-400 transition-all mb-4"
+        >
+          <span className="material-symbols-outlined">logout</span>
+          <span className="font-medium">Logout</span>
+        </button>
+
+        <div className="text-[10px] uppercase tracking-widest text-slate-500 font-bold px-2 py-4">
+          Developed by <span className="text-primary">Krish Joshi</span> & Partner <span className="text-primary">Antigravity</span>
+        </div>
       </nav>
 
       {/* Main Content */}
@@ -73,18 +114,22 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
           </div>
           <div className="flex items-center gap-6">
-            <div className="flex items-center gap-4 text-slate-400">
-              {/* Removed support_agent and settings per user request */}
-            </div>
-            <div className="h-8 w-[1px] bg-white/10"></div>
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
-                <p className="font-h3 text-sm text-white leading-tight uppercase tracking-wide">Guest User</p>
-                <p className="text-[10px] text-primary uppercase tracking-wider font-bold">Voter Status: Active</p>
+                <p className="font-h3 text-sm text-white leading-tight uppercase tracking-wide">
+                  {user ? user.displayName : "Guest User"}
+                </p>
+                <p className="text-[10px] text-primary uppercase tracking-wider font-bold">
+                  {user ? "Voter Account: Verified" : "Voter Status: Active"}
+                </p>
               </div>
-              <div className="w-10 h-10 rounded-full border-2 border-primary/20 bg-white/5 flex items-center justify-center">
-                <span className="material-symbols-outlined text-primary">person</span>
-              </div>
+              {user?.photoURL ? (
+                <img src={user.photoURL} alt="User" className="w-10 h-10 rounded-full border-2 border-primary/20" />
+              ) : (
+                <div className="w-10 h-10 rounded-full border-2 border-primary/20 bg-white/5 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-primary">person</span>
+                </div>
+              )}
             </div>
           </div>
         </header>
