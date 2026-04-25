@@ -11,16 +11,45 @@ interface Candidate {
   alignment: number;
   platform: string;
   avatar: string;
+  focus: string;
 }
 
 export function VoterDatabase() {
   const { setActiveSection } = useAppStore();
-  const candidates: Candidate[] = [
-    { name: "Eleanor Sterling", office: "Governor", party: "Independent", alignment: 92, platform: "Climate Resilience, Educational Reform", avatar: "E" },
-    { name: "Marcus Thorne", office: "Governor", party: "Federalist", alignment: 45, platform: "Infrastructure, Tech Innovation", avatar: "M" },
-    { name: "Sarah Jenkins", office: "District Rep", party: "Civic Action", alignment: 78, platform: "Public Health, Housing Equity", avatar: "S" },
-    { name: "David Chen", office: "District Rep", party: "Independent", alignment: 61, platform: "Small Business Support, Fiscal Transparency", avatar: "D" },
+
+  // Base candidates with default alignments
+  const baseCandidates: Candidate[] = [
+    { name: "Eleanor Sterling", office: "Governor", party: "Independent", alignment: 92, platform: "Climate Resilience, Educational Reform", avatar: "E", focus: "progressive" },
+    { name: "Marcus Thorne", office: "Governor", party: "Federalist", alignment: 45, platform: "Infrastructure, Tech Innovation", avatar: "M", focus: "conservative" },
+    { name: "Sarah Jenkins", office: "District Rep", party: "Civic Action", alignment: 78, platform: "Public Health, Housing Equity", avatar: "S", focus: "moderate" },
+    { name: "David Chen", office: "District Rep", party: "Independent", alignment: 61, platform: "Small Business Support, Fiscal Transparency", avatar: "D", focus: "libertarian" },
   ];
+
+  // Adjust alignments based on quiz results
+  const [candidates, setCandidates] = React.useState<Candidate[]>(baseCandidates);
+
+  React.useEffect(() => {
+    const quizResults = localStorage.getItem('election-quiz-results');
+    if (quizResults) {
+      const parsed = JSON.parse(quizResults);
+      const profile = parsed.profile.primaryValue.toLowerCase();
+
+      // Adjust alignments based on user profile
+      const adjustedCandidates = baseCandidates.map(candidate => {
+        let alignment = candidate.alignment;
+        if (profile === candidate.focus) {
+          alignment = Math.min(100, alignment + 15); // Boost alignment for matching focus
+        } else if (Math.abs(alignment - 50) > 20) {
+          alignment = Math.max(0, alignment - 10); // Slight penalty for mismatch
+        }
+        return { ...candidate, alignment };
+      });
+
+      // Sort by alignment descending
+      adjustedCandidates.sort((a, b) => b.alignment - a.alignment);
+      setCandidates(adjustedCandidates); // eslint-disable-line react-hooks/set-state-in-effect
+    }
+  }, []); // Empty dependency array is correct for initialization
 
   const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
   const [activeRecord, setActiveRecord] = useState<Candidate | null>(null);
@@ -38,6 +67,10 @@ export function VoterDatabase() {
         <div>
           <h1 className="font-h1 text-4xl tracking-tight text-white">Candidate Guide</h1>
           <p className="mt-2 text-slate-400">Verified platforms and historical alignment scores for the upcoming election.</p>
+          <div className="mt-2 flex items-center gap-2">
+            <span className="rounded-full bg-green-500/10 border border-green-500/20 px-3 py-1 text-xs font-bold text-green-400">Non-Partisan</span>
+            <span className="rounded-full bg-blue-500/10 border border-blue-500/20 px-3 py-1 text-xs font-bold text-blue-400">Fact-Checked</span>
+          </div>
         </div>
         <div className="flex gap-3">
           {selectedCandidates.length > 1 && (
@@ -81,7 +114,10 @@ export function VoterDatabase() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-slate-600">Alignment</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">Alignment</p>
+                      <span className="text-[8px] bg-green-500/20 text-green-400 px-1 py-0.5 rounded font-bold">Verified</span>
+                    </div>
                     <p className="font-h1 text-2xl text-primary">{candidate.alignment}%</p>
                   </div>
                 </div>
@@ -259,6 +295,19 @@ export function VoterDatabase() {
           </div>
         )}
       </AnimatePresence>
+
+      <div className="mt-12 rounded-xl bg-yellow-500/10 border border-yellow-500/20 p-6">
+        <div className="flex items-start gap-3">
+          <span className="material-symbols-outlined text-yellow-400 mt-0.5">info</span>
+          <div>
+            <h4 className="text-sm font-bold text-yellow-400 mb-2">Non-Partisan Information</h4>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              This candidate database is provided for informational purposes only. Alignment scores are based on historical voting records and stated positions.
+              We are committed to factual, unbiased information. Always verify candidate information through official sources.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

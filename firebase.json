@@ -7,17 +7,13 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
+    "cleanUrls": true,
+    "trailingSlash": false
   },
   "auth": {
     "providers": {
       "googleSignIn": {
-        "oAuthBrandDisplayName": "NeuroLearn AI Platform",
+        "oAuthBrandDisplayName": "Election AI Assistant",
         "supportEmail": "krishjoshikrishjoshi9@gmail.com"
       }
     }

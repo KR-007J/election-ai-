@@ -62,22 +62,21 @@ export function DashboardHome() {
               animate={{ opacity: 1, x: 0 }}
             >
               <div className="badge border-primary/30 bg-primary/10 text-primary px-5 py-2 text-[10px] font-black uppercase tracking-[0.3em] mb-6 inline-flex">
-                Intelligence Dashboard
+                Election AI Assistant
               </div>
-              <h1 className="font-h1 text-5xl md:text-6xl text-white mb-6 tracking-tight leading-tight">
-                Welcome to <br/>
-                <span className="text-primary italic font-black">NeuroLearn AI Platform</span>
+              <h1 className="font-h1 text-5xl md:text-7xl text-white mb-8 tracking-tight leading-[1.05] max-w-3xl">
+                The Intelligence Command for <span className="text-primary font-black">Election AI</span>
               </h1>
-              <p className="text-slate-400 text-xl max-w-2xl leading-relaxed font-medium mx-auto lg:mx-0">
-                Your centralized command for verified intelligence, advanced learning modules, and real-time data monitoring.
+              <p className="text-slate-400 text-lg md:text-xl max-w-2xl leading-relaxed font-medium mx-auto lg:mx-0 opacity-80">
+                Strategic voter assistance, verified intelligence modules, and real-time polling analytics in one centralized platform.
               </p>
             </motion.div>
           </div>
-          <div className="flex items-center gap-8 bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-md">
-            <div className="text-right">
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-2">General Election</p>
+          <div className="flex items-center gap-8 bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-md shrink-0">
+            <div className="text-right min-w-[120px]">
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-2">Cycle Update</p>
               <p className="text-5xl font-h1 text-white tabular-nums tracking-tighter">12 <span className="text-sm font-body uppercase text-primary tracking-normal font-black">Days</span></p>
-              <p className="text-[10px] text-slate-400 mt-2 font-bold">Tuesday, Nov 5, 2024</p>
+              <p className="text-[10px] text-slate-400 mt-2 font-bold">Protocol Active</p>
             </div>
             <div className="w-px h-16 bg-white/10"></div>
             <div className="w-20 h-20 rounded-2xl bg-primary/20 flex items-center justify-center border border-primary/30 relative">

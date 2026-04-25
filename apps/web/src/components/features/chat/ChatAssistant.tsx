@@ -17,6 +17,20 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
     }
   }, [messages, isLoading]);
 
+  const getOfflineResponse = (query: string) => {
+    const lowerQuery = query.toLowerCase();
+    if (lowerQuery.includes('register') || lowerQuery.includes('registration')) {
+      return "To register to vote, visit your state's election website or Vote.org. You'll need proof of residency and ID. Many states allow online registration.";
+    }
+    if (lowerQuery.includes('id') || lowerQuery.includes('identification')) {
+      return "Voter ID requirements vary by state. Most states require some form of ID, but 8 states have no requirement. Check your state's election office for specifics.";
+    }
+    if (lowerQuery.includes('when') || lowerQuery.includes('election') || lowerQuery.includes('date')) {
+      return "The next presidential election is on November 5, 2024. Early voting begins in most states 4-6 weeks before Election Day.";
+    }
+    return "I'm currently offline, but I can help with basic voting information. For detailed assistance, please ensure the AI service is configured properly.";
+  };
+
   const handleSend = async () => {
     if (!inputValue.trim() || isLoading) return;
 
@@ -31,10 +45,21 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
         parts: [{ text: message.text }],
       }));
 
+      // Add context from user's progress
+      const quizResults = localStorage.getItem('election-quiz-results');
+      let contextMessage = "";
+      if (quizResults) {
+        const parsed = JSON.parse(quizResults);
+        contextMessage = `User has completed the voter quiz with profile: ${JSON.stringify(parsed.profile)}. `;
+      }
+
       const response = await fetch(buildApiUrl("/chat"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: inputValue, history }),
+        body: JSON.stringify({
+          message: contextMessage + inputValue,
+          history
+        }),
       });
 
       const data = await response.json();
@@ -42,16 +67,20 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
       if (response.ok && data.text) {
         addMessage({ role: "model", text: data.text });
       } else {
+        // Try offline fallback
+        const offlineResponse = getOfflineResponse(inputValue);
         addMessage({
           role: "model",
-          text: data.error || "I apologize, but I encountered an error. Please try again.",
+          text: offlineResponse,
         });
       }
     } catch (error) {
       console.error("Chat Error:", error);
+      // Enhanced error handling with offline fallback
+      const offlineResponse = getOfflineResponse(inputValue);
       addMessage({
         role: "model",
-        text: "Assistant is currently offline or API keys are not configured. Please check your .env settings.",
+        text: offlineResponse,
       });
     } finally {
       setIsLoading(false);
@@ -94,7 +123,8 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
         {!inline && (
           <button
             onClick={toggleChat}
-            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-white/5"
+            aria-label="Close chat assistant"
+            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-white/5 focus:outline-2 focus:outline-primary"
             style={{ color: "var(--color-text-tertiary)" }}
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,21 +154,22 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
 
             <div className="flex flex-wrap justify-center gap-2">
               {suggestions.map((suggestion, index) => (
-                <motion.button
-                  key={suggestion}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + index * 0.1 }}
-                  onClick={() => {
-                    setInputValue(suggestion);
-                  }}
-                  className="rounded-full px-3 py-1.5 text-xs font-medium transition-all hover:scale-105"
-                  style={{
-                    background: "var(--color-surface-overlay)",
-                    color: "var(--color-text-secondary)",
-                    border: "1px solid var(--color-border)",
-                  }}
-                >
+                  <motion.button
+                    key={suggestion}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 + index * 0.1 }}
+                    onClick={() => {
+                      setInputValue(suggestion);
+                    }}
+                    aria-label={`Use suggestion: ${suggestion}`}
+                    className="rounded-full px-3 py-1.5 text-xs font-medium transition-all hover:scale-105 focus:outline-2 focus:outline-primary"
+                    style={{
+                      background: "var(--color-surface-overlay)",
+                      color: "var(--color-text-secondary)",
+                      border: "1px solid var(--color-border)",
+                    }}
+                  >
                   {suggestion}
                 </motion.button>
               ))}
@@ -190,7 +221,8 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
             onChange={(event) => setInputValue(event.target.value)}
             onKeyDown={(event) => event.key === "Enter" && handleSend()}
             placeholder="Ask about voter ID, deadlines..."
-            className="w-full rounded-xl py-3 pl-4 pr-12 text-sm transition-all focus:outline-none"
+            aria-label="Type your question for the AI assistant"
+            className="w-full rounded-xl py-3 pl-4 pr-12 text-sm transition-all focus:outline-2 focus:outline-primary"
             style={{
               background: "var(--color-surface-overlay)",
               border: "1px solid var(--color-border)",
@@ -200,7 +232,8 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
           <button
             onClick={handleSend}
             disabled={!inputValue.trim() || isLoading}
-            className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-white transition-all disabled:cursor-not-allowed disabled:opacity-30"
+            aria-label="Send message"
+            className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-white transition-all disabled:cursor-not-allowed disabled:opacity-30 focus:outline-2 focus:outline-white"
             style={{ background: "var(--gradient-brand)" }}
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -235,7 +268,8 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
           onClick={toggleChat}
-          className="fixed bottom-24 right-6 flex h-14 w-14 items-center justify-center rounded-2xl transition-all lg:bottom-6"
+          aria-label="Open AI chat assistant"
+          className="fixed bottom-24 right-6 flex h-14 w-14 items-center justify-center rounded-2xl transition-all lg:bottom-6 focus:outline-2 focus:outline-white"
           style={{
             background: "var(--gradient-brand)",
             boxShadow: "0 4px 20px rgba(66, 133, 244, 0.35)",

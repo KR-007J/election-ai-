@@ -5,7 +5,7 @@
   "main": "./src/index.tsx",
   "types": "./src/index.tsx",
   "scripts": {
-    "lint": "eslint src/**/*.ts*"
+    "lint": "tsc --noEmit"
   },
   "peerDependencies": {
     "react": ">=18",

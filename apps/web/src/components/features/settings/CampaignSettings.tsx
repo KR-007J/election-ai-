@@ -4,6 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 
 export function CampaignSettings() {
+  const [saveMessage, setSaveMessage] = React.useState("");
   const preferences = [
     { id: "notif-email", label: "Email Bulletins", description: "Receive official election updates and deadline reminders via email.", active: true },
     { id: "notif-sms", label: "SMS Alerts", description: "Get real-time text alerts for polling place changes or emergency updates.", active: false },
@@ -105,11 +106,19 @@ export function CampaignSettings() {
 
       {/* Action Footer */}
       <div className="flex items-center justify-end gap-gutter pt-lg border-t border-white/5">
+        {saveMessage && (
+          <p className="mr-auto text-xs font-bold uppercase tracking-[0.2em] text-primary">
+            {saveMessage}
+          </p>
+        )}
         <button className="text-slate-400 hover:text-white transition-colors font-bold px-6 py-2">
           Discard Changes
         </button>
         <button 
-          onClick={() => alert("Preferences saved successfully!")}
+          onClick={() => {
+            setSaveMessage("Preferences saved");
+            window.setTimeout(() => setSaveMessage(""), 2500);
+          }}
           className="bg-primary text-white px-xl py-4 rounded-xl font-bold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
         >
           Save Preferences

@@ -3,7 +3,6 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { DashboardHome } from "@/components/features/dashboard/DashboardHome";
 import { VoterDatabase } from "@/components/features/voters/VoterDatabase";
-import { Analytics } from "@/components/features/analytics/Analytics";
 import { useAppStore } from "@/stores/useAppStore";
 import { AnimatePresence, motion } from "framer-motion";
 import { VoterGuide } from "@/components/features/guide/VoterGuide";
@@ -11,6 +10,7 @@ import { ElectionSimulations } from "@/components/features/simulation/ElectionSi
 import ElectionQuiz from "@/components/features/quiz/ElectionQuiz";
 import { CampaignSettings } from "@/components/features/settings/CampaignSettings";
 import { ChatAssistant } from "@/components/features/chat/ChatAssistant";
+import { Timeline } from "@/components/features/timeline/Timeline";
 
 export default function Home() {
   const { activeSection } = useAppStore();
@@ -24,7 +24,7 @@ export default function Home() {
       case "candidates":
         return <VoterDatabase />;
       case "timeline":
-        return <Analytics />;
+        return <Timeline />;
       case "settings":
         return <CampaignSettings />;
       case "simulation":

@@ -58,26 +58,25 @@ const fallbackVoters = [
   {
     id: 1,
     name: "Arthur Vance",
-    email: "vance@neurolearn.ai",
-    status: "Active",
+    email: "vance@election-ai.ai",
+    status: "Registered",
     sentiment: "Positive",
-    location: "Module A",
+    location: "District A",
     lastActive: new Date(),
   },
   {
     id: 2,
     name: "Sloane Reyes",
-    email: "reyes.s@neurolearn.ai",
+    email: "reyes.s@election-ai.ai",
     status: "Pending",
     sentiment: "Neutral",
-    location: "Module B",
+    location: "District B",
     lastActive: new Date(),
   },
 ];
 
 const getSystemInstruction = (context: string) => `
-You are NeuroLearn AI, a non-partisan specialized intelligence assistant.
-Provide accurate, balanced, factual information help.
+You are the Election AI Assistant, a specialized intelligence for voter guide and election data. Provide concise, verified, and strictly non-partisan information.
 
 Rules:
 1. Never endorse a candidate or party.
@@ -255,7 +254,7 @@ title, category, time, urgent, description, icon.`;
 const start = async () => {
   try {
     await fastify.listen({ port: env.port, host: "0.0.0.0" });
-    fastify.log.info(`NeuroLearn AI API running on http://localhost:${env.port}`);
+    console.log("Election AI Assistant API running on http://localhost:" + env.port);
   } catch (error) {
     fastify.log.error(error);
     process.exit(1);

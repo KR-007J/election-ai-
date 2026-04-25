@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -16,7 +15,62 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { activeSection, setActiveSection } = useAppStore();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showHelp, setShowHelp] = useState(false);
+  const [voiceGuidance, setVoiceGuidance] = useState(false);
   const router = useRouter();
+
+  // Voice guidance function
+  const speakText = (text: string) => {
+    if (voiceGuidance && 'speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.8; // Slower for elderly users
+      utterance.pitch = 1;
+      speechSynthesis.speak(utterance);
+    }
+  };
+
+  // Track user progress
+  const [userProgress, setUserProgress] = useState({
+    quizCompleted: false,
+    guideViewed: false,
+    candidatesExplored: false,
+    timelineViewed: false
+  });
+
+  React.useEffect(() => {
+    // Load progress from localStorage
+    const savedProgress = localStorage.getItem('user-progress');
+    if (savedProgress) {
+      setUserProgress(JSON.parse(savedProgress)); // eslint-disable-line react-hooks/set-state-in-effect
+    }
+
+    // Update progress based on current activity
+    const quizResults = localStorage.getItem('election-quiz-results');
+    if (quizResults) {
+      setUserProgress(prev => ({ ...prev, quizCompleted: true })); // eslint-disable-line react-hooks/set-state-in-effect
+    }
+  }, []); // Empty dependency array is correct for initialization
+
+  // Update progress when section changes
+  React.useEffect(() => {
+    const newProgress = { ...userProgress };
+    switch (activeSection) {
+      case 'quiz':
+        newProgress.quizCompleted = true;
+        break;
+      case 'guide':
+        newProgress.guideViewed = true;
+        break;
+      case 'candidates':
+        newProgress.candidatesExplored = true;
+        break;
+      case 'timeline':
+        newProgress.timelineViewed = true;
+        break;
+    }
+    setUserProgress(newProgress); // eslint-disable-line react-hooks/set-state-in-effect
+    localStorage.setItem('user-progress', JSON.stringify(newProgress));
+  }, [activeSection, userProgress]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -44,6 +98,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     { id: "timeline" as Section, icon: "calendar_month", label: "Election Calendar" },
     { id: "simulation" as Section, icon: "model_training", label: "Interactive Tools" },
     { id: "quiz" as Section, icon: "quiz", label: "Voter Quiz" },
+    { id: "chat" as Section, icon: "chat", label: "AI Assistant" },
     { id: "settings" as Section, icon: "settings", label: "Preferences" },
   ];
 
@@ -56,24 +111,63 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   return (
-    <div className="flex h-screen w-full bg-background text-on-background font-body-md overflow-hidden">
+    <div className="flex h-screen w-full bg-background text-on-background font-body-md overflow-hidden accessible-font">
+      {/* Skip to main content link */}
+      <a href="#main-content" className="skip-link">Skip to main content</a>
+
       {/* SideNavBar */}
-      <nav className="bg-[#0A0E1A]/90 backdrop-blur-2xl text-blue-500 dark:text-blue-400 font-h1 antialiased border-r border-white/5 shadow-2xl flex flex-col h-full py-10 px-8 w-80 shrink-0 z-50">
-        <div className="flex items-center gap-5 mb-12 px-2 cursor-pointer transition-opacity hover:opacity-80" onClick={() => setActiveSection('home')}>
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_20px_rgba(0,229,255,0.1)]">
-            <span className="material-symbols-outlined text-primary text-3xl">account_balance</span>
+      <nav aria-label="Main navigation" className="bg-[#0A0E1A]/90 backdrop-blur-2xl text-blue-500 dark:text-blue-400 font-h1 antialiased border-r border-white/5 shadow-2xl flex flex-col h-full py-10 px-8 w-80 shrink-0 z-50">
+        <div className="flex items-center gap-4 mb-12 px-2 cursor-pointer transition-opacity hover:opacity-80" onClick={() => setActiveSection('home')}>
+          <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_20px_rgba(0,229,255,0.1)] shrink-0">
+            <span className="material-symbols-outlined text-primary text-2xl">account_balance</span>
           </div>
-          <div>
-            <h1 className="text-lg font-bold text-white tracking-tight leading-tight">NeuroLearn AI<br/>Platform</h1>
-            <p className="text-[9px] uppercase tracking-[0.3em] text-primary mt-1 font-black opacity-70">Intelligence</p>
+          <div className="min-w-0 flex flex-col justify-center">
+            <h1 className="text-[15px] font-black text-white tracking-tight leading-tight truncate">Election AI</h1>
+            <p className="text-[9px] uppercase tracking-[0.3em] text-primary/80 font-black">Assistant</p>
           </div>
         </div>
         
+        {/* Progress Section */}
+        <div className="mb-6 rounded-xl bg-white/5 border border-white/10 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Your Progress</h3>
+            <button
+              onClick={() => setShowHelp(!showHelp)}
+              aria-label="Show help and tips"
+              className="text-slate-500 hover:text-white transition-colors"
+            >
+              <span className="material-symbols-outlined text-sm">help</span>
+            </button>
+          </div>
+          <div className="space-y-2">
+            {[
+              { key: 'quizCompleted', label: 'Quiz', icon: 'quiz' },
+              { key: 'guideViewed', label: 'Guide', icon: 'how_to_vote' },
+              { key: 'candidatesExplored', label: 'Candidates', icon: 'person_search' },
+              { key: 'timelineViewed', label: 'Timeline', icon: 'calendar_month' }
+            ].map(({ key, label, icon }) => (
+              <div key={key} className="flex items-center gap-3">
+                <span className={`material-symbols-outlined text-sm ${userProgress[key as keyof typeof userProgress] ? 'text-green-400' : 'text-slate-600'}`}>
+                  {userProgress[key as keyof typeof userProgress] ? 'check_circle' : icon}
+                </span>
+                <span className={`text-xs ${userProgress[key as keyof typeof userProgress] ? 'text-green-400' : 'text-slate-500'}`}>
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="flex-1 space-y-1.5">
           {navItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveSection(item.id)}
+              onClick={() => {
+                setActiveSection(item.id);
+                speakText(`Navigating to ${item.label}`);
+              }}
+              aria-current={activeSection === item.id ? "page" : undefined}
+              aria-label={`Navigate to ${item.label}`}
               className={`w-full flex items-center gap-4 p-3.5 rounded-xl transition-all duration-300 group relative ${
                 activeSection === item.id
                   ? "bg-primary/10 text-primary"
@@ -86,7 +180,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   className="absolute left-0 w-1 h-6 bg-primary rounded-r-full"
                 />
               )}
-              <span className={`material-symbols-outlined text-2xl transition-transform group-hover:scale-110 ${activeSection === item.id ? "fill-1" : ""}`}>
+              <span className={`material-symbols-outlined text-2xl w-6 h-6 flex items-center justify-center overflow-hidden transition-transform group-hover:scale-110 ${activeSection === item.id ? "fill-1" : ""}`}>
                 {item.icon}
               </span>
               <span className="font-bold text-sm tracking-wide">{item.label}</span>
@@ -94,16 +188,28 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           ))}
         </div>
 
-        <button 
+        <button
           onClick={handleLogout}
+          aria-label="Logout from account"
           className="mt-4 w-full flex items-center gap-3 p-3 rounded-xl text-red-400/60 hover:bg-red-500/10 hover:text-red-400 transition-all mb-4"
         >
           <span className="material-symbols-outlined">logout</span>
           <span className="font-medium">Logout</span>
         </button>
 
-        <div className="text-[10px] uppercase tracking-widest text-slate-500 font-bold px-2 py-4">
-          Developed by <span className="text-primary">Krish Joshi</span> & Partner <span className="text-primary">Antigravity</span>
+        <div className="mt-auto pt-8 border-t border-white/5">
+          <div className="px-2 py-4">
+            <div className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-4 leading-relaxed opacity-60">
+              Developed by <span className="text-primary">Krish Joshi</span> <br/>
+              & Partner <span className="text-primary">Antigravity</span>
+            </div>
+
+            {/* Disclaimer */}
+            <div className="text-[8px] text-slate-600 leading-tight">
+              <p className="mb-2 font-bold text-slate-500">DISCLAIMER:</p>
+              <p>This tool provides general information only. Not legal advice. Always verify with official sources. Vote.org | USA.gov | FEC.gov</p>
+            </div>
+          </div>
         </div>
       </nav>
 
@@ -116,6 +222,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <div className="relative w-full">
                 <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 text-xl">search</span>
                 <input
+                  aria-label="Search election information and tools"
                   className="w-full bg-white/5 border border-white/5 rounded-2xl py-3 pl-14 pr-6 text-sm focus:ring-2 focus:ring-primary/40 focus:bg-white/10 transition-all placeholder:text-slate-600 text-white outline-none"
                   placeholder="Search intelligence database, learning modules, or polling analytics..."
                   type="text"
@@ -125,48 +232,117 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-4 pr-4">
-                <button className="p-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all border border-white/5">
+                <button
+                  aria-label="View notifications"
+                  className="p-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all border border-white/5"
+                  onClick={() => speakText("You have no new notifications")}
+                >
                   <span className="material-symbols-outlined">notifications</span>
+                </button>
+                <button
+                  onClick={() => setVoiceGuidance(!voiceGuidance)}
+                  aria-label={`${voiceGuidance ? 'Disable' : 'Enable'} voice guidance for accessibility`}
+                  className={`p-2.5 rounded-xl border transition-all ${
+                    voiceGuidance
+                      ? 'bg-green-500/20 text-green-400 border-green-500/20'
+                      : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border-white/5'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-sm">
+                    {voiceGuidance ? 'volume_up' : 'volume_off'}
+                  </span>
                 </button>
               </div>
               
-              <div className="flex items-center gap-4 pl-8 border-l border-white/5">
-                <div className="text-right hidden lg:block">
-                  <p className="font-bold text-sm text-white leading-none mb-1">
-                    {user ? user.displayName : "Guest Intelligence"}
+              <div className="flex items-center gap-4">
+                <div className="text-right hidden sm:block">
+                  <p className="font-bold text-sm text-white leading-none mb-1.5">
+                    {user ? user.displayName : "Guest User"}
                   </p>
-                  <p className="text-[10px] text-primary uppercase tracking-[0.2em] font-black opacity-70">
-                    {user ? "Verified Agent" : "Anonymous Access"}
+                  <p className="text-[9px] text-primary uppercase tracking-[0.2em] font-black">
+                    {user ? "Verified Access" : "Public View"}
                   </p>
                 </div>
-                {user?.photoURL ? (
-                  <Image
-                    src={user.photoURL}
-                    alt="User"
-                    width={44}
-                    height={44}
-                    unoptimized
-                    className="h-11 w-11 rounded-2xl border border-primary/30 object-cover shadow-[0_0_15px_rgba(0,229,255,0.15)]"
-                  />
-                ) : (
-                  <div className="w-11 h-11 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center overflow-hidden shadow-lg shadow-primary/5">
+                  {user?.photoURL ? (
+                    <div
+                      aria-label="User avatar"
+                      className="h-full w-full bg-cover bg-center"
+                      style={{ backgroundImage: `url("${user.photoURL}")` }}
+                    />
+                  ) : (
                     <span className="material-symbols-outlined text-primary text-2xl">person</span>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </header>
 
-        <section className="flex-1 overflow-y-auto custom-scrollbar relative">
+        <section id="main-content" className="flex-1 overflow-y-auto custom-scrollbar relative" aria-label="Main content area">
           <div className="max-w-[1400px] mx-auto p-8 md:p-12 space-y-10">
             {children}
           </div>
         </section>
 
+        {/* Help Overlay */}
+        {showHelp && (
+          <div className="fixed inset-0 bg-background/90 backdrop-blur-md z-[200] flex items-center justify-center p-6">
+            <div className="glass-panel max-w-md w-full rounded-2xl border border-white/10 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-white">Quick Help Guide</h2>
+                <button
+                  onClick={() => setShowHelp(false)}
+                  aria-label="Close help"
+                  className="text-slate-400 hover:text-white"
+                >
+                  <span className="material-symbols-outlined">close</span>
+                </button>
+              </div>
+              <div className="space-y-4">
+                <div className="flex gap-3">
+                  <span className="material-symbols-outlined text-primary">quiz</span>
+                  <div>
+                    <h3 className="font-bold text-white">Alignment Quiz</h3>
+                    <p className="text-sm text-slate-400">Take our quiz to find candidates that match your values.</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <span className="material-symbols-outlined text-primary">how_to_vote</span>
+                  <div>
+                    <h3 className="font-bold text-white">Voter Guide</h3>
+                    <p className="text-sm text-slate-400">Step-by-step guide to prepare for voting.</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <span className="material-symbols-outlined text-primary">person_search</span>
+                  <div>
+                    <h3 className="font-bold text-white">Candidates</h3>
+                    <p className="text-sm text-slate-400">Compare candidates and view their records.</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <span className="material-symbols-outlined text-primary">chat</span>
+                  <div>
+                    <h3 className="font-bold text-white">AI Assistant</h3>
+                    <p className="text-sm text-slate-400">Ask questions about the election process.</p>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowHelp(false)}
+                className="w-full mt-6 bg-primary py-3 rounded-xl font-bold text-white"
+              >
+                Got it!
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* FAB */}
-        <button 
+        <button
           onClick={() => setActiveSection('guide')}
+          aria-label="Quick access to voter registration guide"
           className="fixed bottom-10 right-10 w-16 h-16 rounded-full bg-primary text-white shadow-[0_0_30px_rgba(0,229,255,0.3)] flex items-center justify-center hover:scale-110 transition-transform active:scale-95 group z-50"
         >
           <span className="material-symbols-outlined text-3xl font-bold">how_to_reg</span>

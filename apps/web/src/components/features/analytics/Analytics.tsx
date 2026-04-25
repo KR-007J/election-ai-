@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 
 export function Analytics() {
+  const [syncMessage, setSyncMessage] = useState("");
   const deadlines = [
     { date: "Oct 15", event: "Voter Registration Deadline", status: "Critical", color: "#FF3D00" },
     { date: "Oct 25", event: "Mail-in Ballot Request Ends", status: "Upcoming", color: "#00E5FF" },
@@ -17,12 +19,18 @@ export function Analytics() {
           <h1 className="font-h1 text-h1 text-white">Election Calendar & Stats</h1>
           <p className="text-on-surface-variant mt-2">Important dates and historical turnout data for your election district.</p>
         </div>
-        <button 
-          onClick={() => alert("Calendar synchronized with your device.")}
-          className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:shadow-[0_0_20px_rgba(0,229,255,0.3)] transition-all"
-        >
-          Sync to My Calendar
-        </button>
+        <div className="flex flex-col items-end gap-2">
+          <button
+            onClick={() => {
+              setSyncMessage("Calendar sync queued");
+              window.setTimeout(() => setSyncMessage(""), 2500);
+            }}
+            className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:shadow-[0_0_20px_rgba(0,229,255,0.3)] transition-all"
+          >
+            Sync to My Calendar
+          </button>
+          {syncMessage && <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">{syncMessage}</p>}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-gutter min-h-[500px]">

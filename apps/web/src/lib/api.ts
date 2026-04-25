@@ -8,7 +8,13 @@ export const getApiBaseUrl = () => {
   }
 
   if (typeof window !== "undefined") {
-    return trimSlash(window.location.origin);
+    const { protocol, hostname, port, origin } = window.location;
+
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      return trimSlash(`${protocol}//${hostname}:${port === "3001" ? port : "3001"}`);
+    }
+
+    return trimSlash(origin);
   }
 
   return "http://localhost:3001";

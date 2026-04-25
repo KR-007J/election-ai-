@@ -17,17 +17,57 @@ interface VoterGuideStep {
 export const VoterGuide = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [steps, setSteps] = useState<VoterGuideStep[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   React.useEffect(() => {
-    getVoterGuideSteps().then(setSteps);
+    const loadSteps = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getVoterGuideSteps();
+        setSteps(data);
+      } catch (err) {
+        console.error('Failed to load voter guide:', err);
+        setError('Unable to load voter guide. Please try refreshing the page.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadSteps();
   }, []);
 
   const step = steps[currentStep];
 
+  if (loading) {
+    return (
+      <div className="text-center py-20">
+        <div className="inline-block w-6 h-6 border-2 border-t-transparent rounded-full animate-spin mb-4" style={{ borderColor: 'var(--color-accent)', borderTopColor: 'transparent' }} />
+        <p className="text-slate-400">Loading voter guide...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-20">
+        <span className="material-symbols-outlined text-red-400 mb-4 text-4xl">error</span>
+        <p className="text-red-400 mb-4">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="bg-primary px-6 py-3 rounded-xl font-bold text-white"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   if (!step) {
     return (
       <div className="text-center py-20">
-        <div className="inline-block w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--color-accent)', borderTopColor: 'transparent' }} />
+        <span className="material-symbols-outlined text-yellow-400 mb-4 text-4xl">info</span>
+        <p className="text-slate-400">No guide steps available.</p>
       </div>
     );
   }
@@ -45,7 +85,9 @@ export const VoterGuide = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.04, duration: 0.4 }}
                 onClick={() => setCurrentStep(i)}
-                className="w-48 lg:w-full text-left p-3 lg:p-4 rounded-xl lg:rounded-2xl flex items-center gap-3 lg:gap-4 transition-all duration-300 shrink-0"
+                aria-current={currentStep === i ? 'step' : undefined}
+                aria-label={`Go to step ${s.id}: ${s.title}`}
+                className="w-48 lg:w-full text-left p-3 lg:p-4 rounded-xl lg:rounded-2xl flex items-center gap-3 lg:gap-4 transition-all duration-300 shrink-0 focus:outline-2 focus:outline-primary"
                 style={{
                   background: currentStep === i ? 'var(--color-accent-glow)' : 'var(--color-surface-overlay)',
                   border: `1px solid ${currentStep === i ? 'rgba(66, 133, 244, 0.3)' : 'rgba(255, 255, 255, 0.05)'}`,
@@ -112,12 +154,29 @@ export const VoterGuide = () => {
               <div className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }} dangerouslySetInnerHTML={{ __html: step.tip }} />
             </div>
 
+            {/* Elderly-friendly help */}
+            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 mb-6">
+              <div className="flex items-start gap-3">
+                <span className="material-symbols-outlined text-yellow-400 mt-0.5">elderly</span>
+                <div>
+                  <h4 className="text-sm font-bold text-yellow-400 mb-1">Need Help?</h4>
+                  <p className="text-xs text-slate-300 mb-2">
+                    If you need assistance with any step, contact your local election office or senior center.
+                  </p>
+                  <button className="text-xs bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded hover:bg-yellow-500/30 transition-colors">
+                    Find Help Near You
+                  </button>
+                </div>
+              </div>
+            </div>
+
             {/* Navigation */}
             <div className="flex justify-between items-center pt-6" style={{ borderTop: '1px solid var(--color-border)' }}>
               <button
                 onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
                 disabled={currentStep === 0}
-                className="text-sm font-medium flex items-center gap-2 transition-all disabled:opacity-30"
+                aria-label="Go to previous step"
+                className="text-sm font-medium flex items-center gap-2 transition-all disabled:opacity-30 focus:outline-2 focus:outline-primary"
                 style={{ color: 'var(--color-text-secondary)' }}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
@@ -129,7 +188,9 @@ export const VoterGuide = () => {
                   <button
                     key={i}
                     onClick={() => setCurrentStep(i)}
-                    className="h-1.5 rounded-full transition-all duration-300"
+                    aria-label={`Go to step ${i + 1}`}
+                    aria-current={i === currentStep ? 'step' : undefined}
+                    className="h-1.5 rounded-full transition-all duration-300 focus:outline-2 focus:outline-primary"
                     style={{
                       width: i === currentStep ? 24 : 8,
                       background: i === currentStep ? 'var(--color-accent)' : 'var(--color-surface-overlay)',
@@ -141,7 +202,8 @@ export const VoterGuide = () => {
               <button
                 onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
                 disabled={currentStep === steps.length - 1}
-                className="text-sm font-medium flex items-center gap-2 transition-all disabled:opacity-30"
+                aria-label="Go to next step"
+                className="text-sm font-medium flex items-center gap-2 transition-all disabled:opacity-30 focus:outline-2 focus:outline-primary"
                 style={{ color: 'var(--color-accent)' }}
               >
                 Next
