@@ -196,19 +196,15 @@ body {
 }
 
 /* ─── Accessibility ────────────────────────────────────────── */
-.accessible-font {
-  font-size: 1.25rem !important;
+.accessible-font p, 
+.accessible-font span:not(.material-symbols-outlined), 
+.accessible-font li {
+  font-size: 1.25rem;
 }
 
-.accessible-font h1,
-.accessible-font h2,
-.accessible-font h3 {
-  font-size: 2rem !important;
-}
-
-.accessible-font h1 { font-size: 2.5rem !important; }
-.accessible-font h2 { font-size: 2rem !important; }
-.accessible-font h3 { font-size: 1.75rem !important; }
+.accessible-font h1 { font-size: 2.5rem; }
+.accessible-font h2 { font-size: 2rem; }
+.accessible-font h3 { font-size: 1.75rem; }
 
 .high-contrast {
   --color-background: #000000;

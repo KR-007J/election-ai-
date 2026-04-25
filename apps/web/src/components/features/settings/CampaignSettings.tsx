@@ -18,7 +18,7 @@ export function CampaignSettings() {
         <p className="text-on-surface-variant font-body-lg">Customize your election experience and manage how we communicate with you.</p>
       </div>
 
-      <div className="grid grid-cols-12 gap-gutter">
+      <div className="grid grid-cols-12 gap-6">
         {/* Navigation Tabs */}
         <div className="col-span-12 lg:col-span-3 flex lg:flex-col gap-2 overflow-x-auto pb-4 lg:pb-0 custom-scrollbar">
           <button className="flex items-center gap-3 px-6 py-4 rounded-xl glass-panel text-white border-primary/20 whitespace-nowrap bg-white/10 ring-1 ring-primary/30">
@@ -105,7 +105,7 @@ export function CampaignSettings() {
       </div>
 
       {/* Action Footer */}
-      <div className="flex items-center justify-end gap-gutter pt-lg border-t border-white/5">
+      <div className="flex items-center justify-end gap-6 pt-6 border-t border-white/5">
         {saveMessage && (
           <p className="mr-auto text-xs font-bold uppercase tracking-[0.2em] text-primary">
             {saveMessage}

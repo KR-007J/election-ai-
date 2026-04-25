@@ -128,7 +128,7 @@ export default function ElectionQuiz() {
     const saved = localStorage.getItem('election-quiz-results');
     if (saved) {
       const parsed = JSON.parse(saved);
-      setAnswers(parsed.answers); // eslint-disable-line react-hooks/set-state-in-effect
+      setAnswers(parsed.answers);
       setIsFinished(true); // eslint-disable-line react-hooks/set-state-in-effect
     }
   }, []); // Empty dependency array is correct here

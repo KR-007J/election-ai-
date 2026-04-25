@@ -33,7 +33,7 @@ export function Analytics() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-gutter min-h-[500px]">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-[500px]">
         {/* Turnout Chart */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -107,7 +107,7 @@ export function Analytics() {
       </div>
 
       {/* Participation Breakdown */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
           { label: "District Rank", value: "#4 of 12", sub: "Top 33% in Turnout", icon: "military_tech", color: "#FFD700" },
           { label: "Active Voters", value: "84,291", sub: "+2.4% vs Last Month", icon: "person_check", color: "#00E5FF" },

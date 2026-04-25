@@ -47,12 +47,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     // Update progress based on current activity
     const quizResults = localStorage.getItem('election-quiz-results');
     if (quizResults) {
-      setUserProgress(prev => ({ ...prev, quizCompleted: true })); // eslint-disable-line react-hooks/set-state-in-effect
+      setUserProgress(prev => ({ ...prev, quizCompleted: true }));
     }
   }, []); // Empty dependency array is correct for initialization
 
   // Update progress when section changes
-  React.useEffect(() => {
+  useEffect(() => {
     const newProgress = { ...userProgress };
     switch (activeSection) {
       case 'quiz':
@@ -111,7 +111,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   return (
-    <div className="flex h-screen w-full bg-background text-on-background font-body-md overflow-hidden accessible-font">
+    <div className="flex h-screen w-full bg-background text-on-background font-body-md overflow-hidden">
       {/* Skip to main content link */}
       <a href="#main-content" className="skip-link">Skip to main content</a>
 
@@ -121,9 +121,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_20px_rgba(0,229,255,0.1)] shrink-0">
             <span className="material-symbols-outlined text-primary text-2xl">account_balance</span>
           </div>
-          <div className="min-w-0 flex flex-col justify-center">
-            <h1 className="text-[15px] font-black text-white tracking-tight leading-tight truncate">Election AI</h1>
-            <p className="text-[9px] uppercase tracking-[0.3em] text-primary/80 font-black">Assistant</p>
+          <div className="min-w-0 flex flex-col justify-center leading-none">
+            <h1 className="text-[15px] font-black text-white tracking-tight leading-none truncate">Election AI</h1>
+            <p className="text-[9px] uppercase tracking-[0.3em] text-primary/80 font-black mt-1">Assistant</p>
           </div>
         </div>
         
@@ -183,7 +183,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <span className={`material-symbols-outlined text-2xl w-6 h-6 flex items-center justify-center overflow-hidden transition-transform group-hover:scale-110 ${activeSection === item.id ? "fill-1" : ""}`}>
                 {item.icon}
               </span>
-              <span className="font-bold text-sm tracking-wide">{item.label}</span>
+              <span className="font-bold text-sm tracking-wide leading-none">{item.label}</span>
             </button>
           ))}
         </div>
@@ -194,7 +194,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           className="mt-4 w-full flex items-center gap-3 p-3 rounded-xl text-red-400/60 hover:bg-red-500/10 hover:text-red-400 transition-all mb-4"
         >
           <span className="material-symbols-outlined">logout</span>
-          <span className="font-medium">Logout</span>
+          <span className="font-medium leading-none">Logout</span>
         </button>
 
         <div className="mt-auto pt-8 border-t border-white/5">
@@ -256,10 +256,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               
               <div className="flex items-center gap-4">
                 <div className="text-right hidden sm:block">
-                  <p className="font-bold text-sm text-white leading-none mb-1.5">
+                  <p className="font-bold text-sm text-white leading-tight mb-0.5">
                     {user ? user.displayName : "Guest User"}
                   </p>
-                  <p className="text-[9px] text-primary uppercase tracking-[0.2em] font-black">
+                  <p className="text-[9px] text-primary uppercase tracking-[0.2em] font-black leading-none">
                     {user ? "Verified Access" : "Public View"}
                   </p>
                 </div>

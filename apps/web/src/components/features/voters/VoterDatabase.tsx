@@ -18,12 +18,12 @@ export function VoterDatabase() {
   const { setActiveSection } = useAppStore();
 
   // Base candidates with default alignments
-  const baseCandidates: Candidate[] = [
+  const baseCandidates: Candidate[] = React.useMemo(() => [
     { name: "Eleanor Sterling", office: "Governor", party: "Independent", alignment: 92, platform: "Climate Resilience, Educational Reform", avatar: "E", focus: "progressive" },
     { name: "Marcus Thorne", office: "Governor", party: "Federalist", alignment: 45, platform: "Infrastructure, Tech Innovation", avatar: "M", focus: "conservative" },
     { name: "Sarah Jenkins", office: "District Rep", party: "Civic Action", alignment: 78, platform: "Public Health, Housing Equity", avatar: "S", focus: "moderate" },
     { name: "David Chen", office: "District Rep", party: "Independent", alignment: 61, platform: "Small Business Support, Fiscal Transparency", avatar: "D", focus: "libertarian" },
-  ];
+  ], []);
 
   // Adjust alignments based on quiz results
   const [candidates, setCandidates] = React.useState<Candidate[]>(baseCandidates);
@@ -49,7 +49,7 @@ export function VoterDatabase() {
       adjustedCandidates.sort((a, b) => b.alignment - a.alignment);
       setCandidates(adjustedCandidates); // eslint-disable-line react-hooks/set-state-in-effect
     }
-  }, []); // Empty dependency array is correct for initialization
+  }, [baseCandidates]); // Include baseCandidates as dependency
 
   const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
   const [activeRecord, setActiveRecord] = useState<Candidate | null>(null);

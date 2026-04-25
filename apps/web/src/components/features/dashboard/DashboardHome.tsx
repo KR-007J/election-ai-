@@ -89,7 +89,7 @@ export function DashboardHome() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {voterStats.map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -113,9 +113,9 @@ export function DashboardHome() {
         ))}
       </div>
 
-      <div className="grid grid-cols-12 gap-gutter">
+      <div className="grid grid-cols-12 gap-6">
         {/* Resource Center */}
-        <div className="col-span-12 lg:col-span-8 space-y-gutter">
+        <div className="col-span-12 lg:col-span-8 space-y-6">
           {/* Priority Tasks */}
           <div className="glass-panel p-10 rounded-[2.5rem] border border-white/5 bg-surface/30">
             <div className="flex justify-between items-center mb-10">
