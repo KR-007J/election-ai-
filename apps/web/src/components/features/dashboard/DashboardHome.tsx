@@ -61,7 +61,7 @@ export function DashboardHome() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
             >
-              <div className="badge border-primary/30 bg-primary/10 text-primary px-5 py-2 text-[10px] font-black uppercase tracking-[0.3em] mb-6 inline-flex">
+              <div className="badge border-primary/30 bg-primary/10 text-primary px-5 py-2 text-[10px] font-black uppercase mb-6 inline-flex">
                 Election AI Assistant
               </div>
               <h1 className="font-h1 text-5xl md:text-7xl text-white mb-8 tracking-tight leading-[1.05] max-w-3xl">
@@ -74,7 +74,7 @@ export function DashboardHome() {
           </div>
           <div className="flex items-center gap-8 bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-md shrink-0">
             <div className="text-right min-w-[120px]">
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-2">Cycle Update</p>
+              <p className="text-[10px] font-black uppercase text-slate-500 mb-2">Cycle Update</p>
               <p className="text-5xl font-h1 text-white tabular-nums tracking-tighter">12 <span className="text-sm font-body uppercase text-primary tracking-normal font-black">Days</span></p>
               <p className="text-[10px] text-slate-400 mt-2 font-bold">Protocol Active</p>
             </div>
@@ -106,7 +106,7 @@ export function DashboardHome() {
                 <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10">{stat.change}</span>
               </div>
               <h3 className="text-4xl font-h1 text-white tracking-tight tabular-nums">{stat.value}</h3>
-              <p className="text-slate-500 text-[10px] uppercase font-black mt-3 tracking-[0.3em]">{stat.label}</p>
+              <p className="text-slate-500 text-[10px] uppercase font-black mt-3"> {stat.label}</p>
             </div>
             <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/[0.02] rounded-full translate-x-1/2 translate-y-1/2"></div>
           </motion.div>
@@ -123,7 +123,7 @@ export function DashboardHome() {
                 <h3 className="font-h3 text-2xl text-white tracking-tight">Your Voter Checklist</h3>
                 <p className="text-slate-500 text-sm mt-1">Operational readiness for the upcoming cycle</p>
               </div>
-              <button onClick={() => setActiveSection('guide')} className="bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all">
+              <button onClick={() => setActiveSection('guide')} className="bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-xl text-xs font-black uppercase transition-all">
                 Full Protocol
               </button>
             </div>
@@ -138,7 +138,7 @@ export function DashboardHome() {
                     <span className={`material-symbols-outlined text-2xl ${task.color}`}>{task.icon}</span>
                   </div>
                   <p className="text-white font-bold text-lg mb-2">{task.title}</p>
-                  <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${task.color}`}>{task.status}</p>
+                  <p className={`text-[10px] font-black uppercase ${task.color}`}>{task.status}</p>
                 </button>
               ))}
             </div>
@@ -152,8 +152,8 @@ export function DashboardHome() {
                 <p className="text-sm text-slate-500 mt-1">Real-time engagement trends vs. historical benchmarks</p>
               </div>
               <div className="flex gap-2 bg-white/5 p-1.5 rounded-xl border border-white/5">
-                <button className="px-5 py-2 text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 rounded-lg shadow-lg">District</button>
-                <button className="px-5 py-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white transition-colors">National</button>
+                <button className="px-5 py-2 text-[10px] font-black uppercase text-primary bg-primary/10 rounded-lg shadow-lg">District</button>
+                <button className="px-5 py-2 text-[10px] font-black uppercase text-slate-500 hover:text-white transition-colors">National</button>
               </div>
             </div>
             <div className="flex-1 flex items-end justify-between gap-6 px-4 pb-4">
@@ -169,7 +169,7 @@ export function DashboardHome() {
                       {h}%
                     </div>
                   </div>
-                  <span className="text-[10px] text-slate-600 font-black uppercase tracking-widest">T-{14-i*2}D</span>
+                  <span className="text-[10px] text-slate-600 font-black uppercase">T-{14-i*2}D</span>
                 </div>
               ))}
             </div>
@@ -222,10 +222,10 @@ export function DashboardHome() {
                     }`}
                   >
                     <div className="flex justify-between items-center mb-4">
-                      <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.2em] ${bulletin.urgent ? 'bg-primary/20 text-primary border border-primary/20' : 'bg-white/5 text-slate-500 border border-white/5'}`}>
+                      <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase ${bulletin.urgent ? 'bg-primary/20 text-primary border border-primary/20' : 'bg-white/5 text-slate-500 border border-white/5'}`}>
                         {bulletin.category}
                       </div>
-                      <span className="text-[10px] text-slate-600 font-black uppercase tracking-widest">{bulletin.time}</span>
+                      <span className="text-[10px] text-slate-600 font-black uppercase">{bulletin.time}</span>
                     </div>
                     <p className="text-white text-lg font-bold leading-tight group-hover:text-primary transition-colors mb-3">
                       {bulletin.title}
@@ -238,7 +238,7 @@ export function DashboardHome() {
               )}
             </div>
 
-            <button className="w-full mt-8 py-5 bg-white/5 rounded-2xl text-[10px] text-slate-400 uppercase font-black tracking-[0.3em] hover:bg-white/10 hover:text-white transition-all border border-white/10">
+            <button className="w-full mt-8 py-5 bg-white/5 rounded-2xl text-[10px] text-slate-400 uppercase font-black hover:bg-white/10 hover:text-white transition-all border border-white/10">
               Protocol Archive
             </button>
           </div>

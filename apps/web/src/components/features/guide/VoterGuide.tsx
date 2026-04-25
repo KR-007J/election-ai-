@@ -93,7 +93,7 @@ export const VoterGuide = () => {
                   border: `1px solid ${currentStep === i ? 'rgba(66, 133, 244, 0.3)' : 'rgba(255, 255, 255, 0.05)'}`,
                 }}
               >
-                <span className="text-xl lg:text-2xl shrink-0 transition-transform duration-300" style={{ transform: currentStep === i ? 'scale(1.1)' : 'scale(1)' }}>{s.icon}</span>
+                <span className="material-symbols-outlined notranslate text-xl lg:text-2xl shrink-0 transition-transform duration-300" style={{ transform: currentStep === i ? 'scale(1.1)' : 'scale(1)' }}>{s.icon}</span>
                 <div className="min-w-0">
                   <div className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest mb-0.5 lg:mb-1 opacity-40">Step {s.id}</div>
                   <div className="text-xs lg:text-sm font-bold truncate" style={{ color: currentStep === i ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}>{s.title}</div>
@@ -115,8 +115,8 @@ export const VoterGuide = () => {
           >
             {/* Step Header */}
             <div className="flex items-center gap-6 mb-10">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl shadow-glow" style={{ background: 'var(--color-surface-overlay)', border: '1px solid var(--color-border)' }}>
-                {step.icon}
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-glow" style={{ background: 'var(--color-surface-overlay)', border: '1px solid var(--color-border)' }}>
+                <span className="material-symbols-outlined notranslate text-4xl">{step.icon}</span>
               </div>
               <div>
                 <div className="badge badge-accent mb-2">Preparation Phase</div>

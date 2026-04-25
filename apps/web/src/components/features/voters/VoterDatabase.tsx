@@ -115,7 +115,7 @@ export function VoterDatabase() {
                   </div>
                   <div className="text-right">
                     <div className="flex items-center gap-2 mb-1">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">Alignment</p>
+                      <p className="text-[10px] font-black uppercase text-slate-600">Alignment</p>
                       <span className="text-[8px] bg-green-500/20 text-green-400 px-1 py-0.5 rounded font-bold">Verified</span>
                     </div>
                     <p className="font-h1 text-2xl text-primary">{candidate.alignment}%</p>
@@ -132,13 +132,13 @@ export function VoterDatabase() {
                   <div className="flex gap-3 pt-2">
                     <button
                       onClick={() => setActiveRecord(candidate)}
-                      className="flex-1 rounded-xl border border-white/10 bg-white/5 py-3 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-white/10"
+                      className="flex-1 rounded-xl border border-white/10 bg-white/5 py-3 text-[10px] font-black uppercase text-white transition-all hover:bg-white/10"
                     >
                       Voting Record
                     </button>
                     <button
                       onClick={() => toggleCompare(candidate.name)}
-                      className={`flex-1 rounded-xl border py-3 text-[10px] font-black uppercase tracking-widest transition-all ${
+                      className={`flex-1 rounded-xl border py-3 text-[10px] font-black uppercase transition-all ${
                         selectedCandidates.includes(candidate.name)
                           ? "border-primary bg-primary text-white"
                           : "border-white/10 bg-white/5 text-slate-400 hover:text-white"
@@ -188,7 +188,7 @@ export function VoterDatabase() {
 
               <div className="space-y-6">
                 <div className="rounded-2xl border border-white/5 bg-white/5 p-8">
-                  <h4 className="mb-4 text-xs font-black uppercase tracking-[0.2em] text-primary">Key Legislation Votes</h4>
+                  <h4 className="mb-4 text-xs font-black uppercase text-primary">Key Legislation Votes</h4>
                   <div className="space-y-6">
                     {[
                       { bill: "Climate Resilience Act 2023", vote: "Yes" },
@@ -197,7 +197,7 @@ export function VoterDatabase() {
                     ].map((vote) => (
                       <div key={vote.bill} className="flex items-center justify-between border-b border-white/5 py-2 last:border-0">
                         <span className="text-sm font-medium text-white">{vote.bill}</span>
-                        <span className={`text-[10px] font-black uppercase tracking-widest ${vote.vote === "Yes" ? "text-green-400" : "text-red-400"}`}>
+                        <span className={`text-[10px] font-black uppercase ${vote.vote === "Yes" ? "text-green-400" : "text-red-400"}`}>
                           {vote.vote}
                         </span>
                       </div>
@@ -253,9 +253,7 @@ export function VoterDatabase() {
 
               <div className="grid grid-cols-3 gap-8">
                 <div className="space-y-12 pt-24">
-                  <div className="flex h-10 items-center text-[10px] font-black uppercase tracking-widest text-primary">Office Target</div>
-                  <div className="flex h-10 items-center text-[10px] font-black uppercase tracking-widest text-primary">Alignment Score</div>
-                  <div className="flex h-10 items-center text-[10px] font-black uppercase tracking-widest text-primary">Key Focus Areas</div>
+                  <div className="flex h-10 items-center text-[10px] font-black uppercase text-primary">Key Focus Areas</div>
                 </div>
                 {selectedCandidates
                   .map((name) => candidates.find((candidate) => candidate.name === name))
@@ -275,7 +273,7 @@ export function VoterDatabase() {
                           <div className="flex h-10 items-center justify-center font-h1 text-3xl text-primary">{candidate.alignment}%</div>
                           <div className="flex h-20 flex-wrap content-center justify-center gap-2">
                             {candidate.platform.split(", ").map((issue) => (
-                              <span key={issue} className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-[8px] font-bold uppercase tracking-widest text-slate-400">
+                              <span key={issue} className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-[8px] font-bold uppercase text-slate-400">
                                 {issue}
                               </span>
                             ))}

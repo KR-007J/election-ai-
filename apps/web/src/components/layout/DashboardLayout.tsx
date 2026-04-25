@@ -122,15 +122,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <span className="material-symbols-outlined text-primary text-2xl">account_balance</span>
           </div>
           <div className="min-w-0 flex flex-col justify-center leading-none">
-            <h1 className="text-[15px] font-black text-white tracking-tight leading-none truncate">Election AI</h1>
-            <p className="text-[9px] uppercase tracking-[0.3em] text-primary/80 font-black mt-1">Assistant</p>
+            <h1 className="text-base font-black text-white truncate">Election AI</h1>
           </div>
         </div>
         
         {/* Progress Section */}
         <div className="mb-6 rounded-xl bg-white/5 border border-white/10 p-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Your Progress</h3>
+            <h3 className="text-xs font-bold text-slate-500">Progress</h3>
             <button
               onClick={() => setShowHelp(!showHelp)}
               aria-label="Show help and tips"
@@ -147,7 +146,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               { key: 'timelineViewed', label: 'Timeline', icon: 'calendar_month' }
             ].map(({ key, label, icon }) => (
               <div key={key} className="flex items-center gap-3">
-                <span className={`material-symbols-outlined text-sm ${userProgress[key as keyof typeof userProgress] ? 'text-green-400' : 'text-slate-600'}`}>
+                <span className={`material-symbols-outlined notranslate text-sm ${userProgress[key as keyof typeof userProgress] ? 'text-green-400' : 'text-slate-600'}`}>
                   {userProgress[key as keyof typeof userProgress] ? 'check_circle' : icon}
                 </span>
                 <span className={`text-xs ${userProgress[key as keyof typeof userProgress] ? 'text-green-400' : 'text-slate-500'}`}>
@@ -158,7 +157,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </div>
 
-        <div className="flex-1 space-y-1.5">
+        <div className="flex-1 space-y-2">
           {navItems.map((item) => (
             <button
               key={item.id}
@@ -168,22 +167,21 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               }}
               aria-current={activeSection === item.id ? "page" : undefined}
               aria-label={`Navigate to ${item.label}`}
-              className={`w-full flex items-center gap-4 p-3.5 rounded-xl transition-all duration-300 group relative ${
+              className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 group relative overflow-hidden ${
                 activeSection === item.id
                   ? "bg-primary/10 text-primary"
                   : "text-slate-500 hover:bg-white/5 hover:text-slate-300"
               }`}
             >
               {activeSection === item.id && (
-                <motion.div 
-                  layoutId="active-nav"
+                <div 
                   className="absolute left-0 w-1 h-6 bg-primary rounded-r-full"
                 />
               )}
-              <span className={`material-symbols-outlined text-2xl w-6 h-6 flex items-center justify-center overflow-hidden transition-transform group-hover:scale-110 ${activeSection === item.id ? "fill-1" : ""}`}>
+              <span className={`material-symbols-outlined notranslate text-2xl shrink-0 transition-transform group-hover:scale-110 ${activeSection === item.id ? "fill-1" : ""}`}>
                 {item.icon}
               </span>
-              <span className="font-bold text-sm tracking-wide leading-none">{item.label}</span>
+              <span className="font-bold text-sm leading-none whitespace-nowrap">{item.label}</span>
             </button>
           ))}
         </div>
@@ -197,19 +195,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <span className="font-medium leading-none">Logout</span>
         </button>
 
-        <div className="mt-auto pt-8 border-t border-white/5">
-          <div className="px-2 py-4">
-            <div className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-4 leading-relaxed opacity-60">
-              Developed by <span className="text-primary">Krish Joshi</span> <br/>
-              & Partner <span className="text-primary">Antigravity</span>
+        <div className="mt-auto pt-4">
+            {/* Minimal Disclaimer */}
+            <div className="text-[8px] text-slate-600 leading-tight opacity-50 px-2">
+              <p>Verified information only. Always check official sources.</p>
             </div>
-
-            {/* Disclaimer */}
-            <div className="text-[8px] text-slate-600 leading-tight">
-              <p className="mb-2 font-bold text-slate-500">DISCLAIMER:</p>
-              <p>This tool provides general information only. Not legal advice. Always verify with official sources. Vote.org | USA.gov | FEC.gov</p>
-            </div>
-          </div>
         </div>
       </nav>
 
@@ -237,7 +227,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   className="p-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all border border-white/5"
                   onClick={() => speakText("You have no new notifications")}
                 >
-                  <span className="material-symbols-outlined">notifications</span>
+                  <span className="material-symbols-outlined notranslate">notifications</span>
                 </button>
                 <button
                   onClick={() => setVoiceGuidance(!voiceGuidance)}
@@ -248,7 +238,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border-white/5'
                   }`}
                 >
-                  <span className="material-symbols-outlined text-sm">
+                  <span className="material-symbols-outlined notranslate text-sm">
                     {voiceGuidance ? 'volume_up' : 'volume_off'}
                   </span>
                 </button>
@@ -256,11 +246,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               
               <div className="flex items-center gap-4">
                 <div className="text-right hidden sm:block">
-                  <p className="font-bold text-sm text-white leading-tight mb-0.5">
+                  <p className="font-bold text-sm text-white leading-none">
                     {user ? user.displayName : "Guest User"}
-                  </p>
-                  <p className="text-[9px] text-primary uppercase tracking-[0.2em] font-black leading-none">
-                    {user ? "Verified Access" : "Public View"}
                   </p>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center overflow-hidden shadow-lg shadow-primary/5">
@@ -271,7 +258,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       style={{ backgroundImage: `url("${user.photoURL}")` }}
                     />
                   ) : (
-                    <span className="material-symbols-outlined text-primary text-2xl">person</span>
+                    <span className="material-symbols-outlined notranslate text-primary text-2xl">person</span>
                   )}
                 </div>
               </div>

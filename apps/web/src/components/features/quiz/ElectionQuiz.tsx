@@ -205,7 +205,7 @@ export default function ElectionQuiz() {
             )}
           </div>
           <div className="text-right">
-            <span className="text-[10px] font-black uppercase tracking-widest text-primary mb-1 block">Progress</span>
+            <span className="text-[10px] font-black uppercase text-primary mb-1 block">Progress</span>
             <span className="text-2xl font-h1 text-white">{Math.round(progress)}%</span>
           </div>
         </div>
@@ -228,7 +228,7 @@ export default function ElectionQuiz() {
             className="flex-1"
           >
             <div className="glass-panel p-10 rounded-[2.5rem] border border-white/5 bg-surface/30 relative overflow-hidden">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 block">Question {currentStep + 1} of {questions.length}</span>
+              <span className="text-[10px] font-black uppercase text-slate-500 mb-6 block">Question {currentStep + 1} of {questions.length}</span>
               <h2 className="text-3xl font-bold text-white mb-10 leading-tight">
                 {questions[currentStep].text}
               </h2>
@@ -278,7 +278,7 @@ export default function ElectionQuiz() {
                 ].map((trait) => (
                   <div key={trait.label} className="p-8 rounded-2xl bg-white/5 border border-white/5 text-center">
                     <span className="material-symbols-outlined text-primary mb-4 text-3xl">{trait.icon}</span>
-                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-2">{trait.label}</p>
+                    <p className="text-[10px] text-slate-500 font-black uppercase mb-2">{trait.label}</p>
                     <p className="text-2xl text-white font-bold">{trait.val}</p>
                   </div>
                 ));
