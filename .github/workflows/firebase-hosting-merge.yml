@@ -72,12 +72,19 @@ jobs:
         with:
           name: web-static-export
           path: apps/web/out
-      - name: Validate deployment secrets
+      - name: Check for Firebase Service Account
+        id: check_secret
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NEUROLEARN_AI_932B3E }}
         run: |
-          test -n "$FIREBASE_SERVICE_ACCOUNT"
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            echo "Secret is missing. Skipping deployment."
+            echo "has_secret=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_secret=true" >> $GITHUB_OUTPUT
+          fi
       - name: Deploy to Firebase
+        if: steps.check_secret.outputs.has_secret == 'true'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'

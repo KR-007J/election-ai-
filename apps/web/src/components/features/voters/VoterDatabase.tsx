@@ -133,8 +133,8 @@ export function VoterDatabase() {
                       type="button"
                       onClick={() => toggleCompare(candidate.name)}
                       className={`flex-1 rounded-xl border py-3 text-[10px] font-black uppercase transition-all ${selectedCandidates.includes(candidate.name)
-                          ? "border-primary bg-primary text-white"
-                          : "border-white/10 bg-white/5 text-slate-400 hover:text-white"
+                        ? "border-primary bg-primary text-white"
+                        : "border-white/10 bg-white/5 text-slate-400 hover:text-white"
                         }`}
                     >
                       {selectedCandidates.includes(candidate.name) ? "Selected" : "Compare"}
