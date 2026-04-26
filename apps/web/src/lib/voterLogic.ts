@@ -1,12 +1,4 @@
-export interface Candidate {
-  name: string;
-  office: string;
-  party: string;
-  alignment: number;
-  platform: string;
-  avatar: string;
-  focus: string;
-}
+import { type Candidate } from "@/types";
 
 /**
  * Calculates the adjusted alignment for a candidate based on the user's primary value profile.

@@ -32,17 +32,5 @@ export default function manifest(): MetadataRoute.Manifest {
         type: "image/x-icon",
       },
     ],
-    shortcuts: [
-      {
-        name: "Voter Guide",
-        url: "/guide",
-        description: "Step-by-step voter preparation"
-      },
-      {
-        name: "AI Assistant",
-        url: "/chat",
-        description: "Ask questions to Gemini"
-      }
-    ]
   };
 }

@@ -5,18 +5,13 @@ import { useAppStore } from "@/stores/useAppStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { AppIcon } from "@/components/ui/AppIcon";
 
-import { getAdjustedCandidates, type Candidate } from "@/lib/voterLogic";
+import { candidates as baseCandidates } from "@/data/candidates";
+import { type Candidate } from "@/types";
+import { getAdjustedCandidates } from "@/lib/voterLogic";
+import { PollingMap } from "./PollingMap";
 
 export function VoterDatabase() {
   const { setActiveSection } = useAppStore();
-
-  // Base candidates with default alignments
-  const baseCandidates: Candidate[] = React.useMemo(() => [
-    { name: "Eleanor Sterling", office: "Governor", party: "Independent", alignment: 92, platform: "Climate Resilience, Educational Reform", avatar: "E", focus: "progressive" },
-    { name: "Marcus Thorne", office: "Governor", party: "Federalist", alignment: 45, platform: "Infrastructure, Tech Innovation", avatar: "M", focus: "conservative" },
-    { name: "Sarah Jenkins", office: "District Rep", party: "Civic Action", alignment: 78, platform: "Public Health, Housing Equity", avatar: "S", focus: "moderate" },
-    { name: "David Chen", office: "District Rep", party: "Independent", alignment: 61, platform: "Small Business Support, Fiscal Transparency", avatar: "D", focus: "libertarian" },
-  ], []);
 
   // Adjust alignments based on quiz results
   const sortedCandidates = React.useMemo(() => {
@@ -147,6 +142,11 @@ export function VoterDatabase() {
           </motion.div>
         ))}
       </div>
+
+      <div className="mt-16">
+        <PollingMap />
+      </div>
+
 
       <AnimatePresence>
         {activeRecord && (
