@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useAppStore } from "@/stores/useAppStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { buildApiUrl } from "@/lib/api";
-import { initAnalytics } from "@/lib/firebase";
+import { initAnalytics, isFirebaseConfigured } from "@/lib/firebase";
 import { logEvent } from "firebase/analytics";
 
 /**
@@ -86,8 +86,7 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
           text: offlineResponse,
         });
       }
-    } catch (error) {
-      console.error("Chat Error:", error);
+    } catch {
       // Enhanced error handling with offline fallback
       const offlineResponse = getOfflineResponse(inputValue);
       addMessage({
@@ -126,14 +125,15 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
             </div>
             <div className="flex items-center gap-1.5">
               <div className="glow-dot" style={{ width: 4, height: 4 }} />
-              <span className="text-[10px] font-medium" style={{ color: "var(--color-success)" }}>
-                Online
+              <span className="text-[10px] font-medium" style={{ color: isFirebaseConfigured ? "var(--color-success)" : "var(--color-text-tertiary)" }}>
+                {isFirebaseConfigured ? "AI Ready" : "Offline Ready"}
               </span>
             </div>
           </div>
         </div>
         {!inline && (
           <button
+            type="button"
             onClick={toggleChat}
             aria-label="Close chat assistant"
             className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-white/5 focus:outline-2 focus:outline-primary"
@@ -146,7 +146,7 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
         )}
       </div>
 
-      <div ref={scrollRef} className="flex-grow space-y-4 overflow-y-auto p-4">
+      <div ref={scrollRef} aria-live="polite" aria-busy={isLoading} className="flex-grow space-y-4 overflow-y-auto p-4">
         {messages.length === 0 && (
           <div className="py-8 text-center">
             <motion.div
@@ -167,6 +167,7 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
             <div className="flex flex-wrap justify-center gap-2">
               {suggestions.map((suggestion, index) => (
                   <motion.button
+                    type="button"
                     key={suggestion}
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -242,6 +243,7 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
             }}
           />
           <button
+            type="button"
             onClick={handleSend}
             disabled={!inputValue.trim() || isLoading}
             aria-label="Send message"
@@ -275,6 +277,7 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
         </motion.div>
       ) : (
         <motion.button
+          type="button"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           whileHover={{ scale: 1.08 }}

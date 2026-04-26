@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { AppIcon } from "@/components/ui/AppIcon";
 
 export default function Error({
@@ -10,9 +10,7 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    console.error("Application Error:", error);
-  }, [error]);
+  const router = useRouter();
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#020617] p-6 text-center">
@@ -39,7 +37,7 @@ export default function Error({
         </button>
         <button
           type="button"
-          onClick={() => window.location.href = "/"}
+          onClick={() => router.push("/")}
           className="rounded-2xl border border-white/10 bg-white/5 px-8 py-4 font-bold text-white transition-all hover:bg-white/10"
         >
           Return to Base

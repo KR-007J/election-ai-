@@ -62,16 +62,9 @@ const TimelineCard = ({
         <div className="w-px flex-1 bg-[var(--color-border)]" />
       </div>
 
-      <motion.div
+      <motion.button
+        type="button"
         onClick={() => setActiveId(isActive ? null : item.id)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            setActiveId(isActive ? null : item.id);
-          }
-        }}
-        role="button"
-        tabIndex={0}
         aria-expanded={isActive}
         aria-controls={`timeline-details-${item.id}`}
         aria-label={`Expand details for ${item.title}`}
@@ -151,7 +144,7 @@ const TimelineCard = ({
             </p>
           )}
         </div>
-      </motion.div>
+      </motion.button>
     </motion.div>
   );
 };
@@ -161,6 +154,7 @@ export const Timeline = () => {
   const [timelineData, setTimelineData] = useState<TimelineItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryToken, setRetryToken] = useState(0);
 
   React.useEffect(() => {
     const loadTimeline = async () => {
@@ -169,15 +163,14 @@ export const Timeline = () => {
         setError(null);
         const data = await getTimelineEvents();
         setTimelineData(data);
-      } catch (err) {
-        console.error('Failed to load timeline:', err);
+      } catch {
         setError('Unable to load election timeline. Please try refreshing the page.');
       } finally {
         setLoading(false);
       }
     };
     loadTimeline();
-  }, []);
+  }, [retryToken]);
 
   if (loading) {
     return (
@@ -198,7 +191,7 @@ export const Timeline = () => {
         <p className="text-red-400 mb-4">{error}</p>
         <button
           type="button"
-          onClick={() => window.location.reload()}
+          onClick={() => setRetryToken((value) => value + 1)}
           className="bg-primary px-6 py-3 rounded-xl font-bold text-white"
         >
           Retry

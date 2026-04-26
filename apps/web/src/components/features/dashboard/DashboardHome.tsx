@@ -34,7 +34,7 @@ export function DashboardHome() {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) setBulletins(data);
     } catch {
-      console.warn("API Offline or connection error. Using local bulletins.");
+      // Intentionally silent: local bulletins provide the fallback experience.
     } finally {
       setIsLoading(false);
     }
@@ -125,7 +125,7 @@ export function DashboardHome() {
                 <h3 className="font-h3 text-2xl text-white tracking-tight">Your Voter Checklist</h3>
                 <p className="text-slate-500 text-sm mt-1">Operational readiness for the upcoming cycle</p>
               </div>
-              <button onClick={() => setActiveSection('guide')} className="bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-xl text-xs font-black uppercase transition-all">
+              <button type="button" onClick={() => setActiveSection('guide')} className="bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-xl text-xs font-black uppercase transition-all">
                 Full Protocol
               </button>
             </div>
@@ -135,7 +135,12 @@ export function DashboardHome() {
                 { title: "Sample Ballot", icon: "description" as AppIconName, status: "Available", color: "text-primary", bg: "bg-primary/10", border: "border-primary/20" },
                 { title: "Polling Directions", icon: "map" as AppIconName, status: "Pending", color: "text-slate-500", bg: "bg-white/5", border: "border-white/10" },
               ].map((task) => (
-                <button key={task.title} className={`p-8 rounded-2xl bg-white/5 border ${task.border} hover:scale-[1.02] transition-all text-left group`}>
+                <button 
+                  type="button" 
+                  key={task.title} 
+                  aria-label={`Open ${task.title} task`}
+                  className={`p-8 rounded-2xl bg-white/5 border ${task.border} hover:scale-[1.02] transition-all text-left group`}
+                >
                   <div className={`w-12 h-12 rounded-xl ${task.bg} flex items-center justify-center mb-6 transition-transform group-hover:scale-110`}>
                     <AppIcon name={task.icon} className={`h-6 w-6 ${task.color}`} />
                   </div>
@@ -154,8 +159,8 @@ export function DashboardHome() {
                 <p className="text-sm text-slate-500 mt-1">Real-time engagement trends vs. historical benchmarks</p>
               </div>
               <div className="flex gap-2 bg-white/5 p-1.5 rounded-xl border border-white/5">
-                <button className="px-5 py-2 text-[10px] font-black uppercase text-primary bg-primary/10 rounded-lg shadow-lg">District</button>
-                <button className="px-5 py-2 text-[10px] font-black uppercase text-slate-500 hover:text-white transition-colors">National</button>
+                <button type="button" className="px-5 py-2 text-[10px] font-black uppercase text-primary bg-primary/10 rounded-lg shadow-lg">District</button>
+                <button type="button" className="px-5 py-2 text-[10px] font-black uppercase text-slate-500 hover:text-white transition-colors">National</button>
               </div>
             </div>
             <div className="flex-1 flex items-end justify-between gap-6 px-4 pb-4">
@@ -189,7 +194,8 @@ export function DashboardHome() {
                 </div>
                 <h3 className="font-h3 text-2xl text-white tracking-tight">Live Updates</h3>
               </div>
-              <button 
+              <button
+                type="button"
                 onClick={fetchBulletins}
                 disabled={isLoading}
                 className="w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl transition-all disabled:opacity-30 border border-white/5"
@@ -246,7 +252,7 @@ export function DashboardHome() {
               )}
             </div>
 
-            <button className="w-full mt-8 py-5 bg-white/5 rounded-2xl text-[10px] text-slate-400 uppercase font-black hover:bg-white/10 hover:text-white transition-all border border-white/10">
+            <button type="button" className="w-full mt-8 py-5 bg-white/5 rounded-2xl text-[10px] text-slate-400 uppercase font-black hover:bg-white/10 hover:text-white transition-all border border-white/10">
               Protocol Archive
             </button>
           </div>

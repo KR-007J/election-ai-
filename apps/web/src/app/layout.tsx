@@ -3,10 +3,15 @@ import "./globals.css";
 import { RootLayoutClient } from "@/components/layout/RootLayoutClient";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://election-assistant.ai"),
+  applicationName: "Election AI Assistant",
   title: "Election AI Assistant | Intelligence Command for Voters",
   description: "Enterprise-grade election intelligence platform tailored for elderly users. Non-partisan candidate research, step-by-step voter guides, and AI-powered assistance.",
   keywords: ["election 2024", "voter assistant", "senior voting help", "candidate comparison", "election timeline", "non-partisan voter guide"],
   authors: [{ name: "Krish Joshi" }, { name: "Antigravity AI" }],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "Election AI Assistant | Your Democratic Partner",
     description: "Advanced election intelligence and voter assistance platform for all citizens.",
@@ -22,8 +27,13 @@ export const metadata: Metadata = {
   },
   robots: "index, follow",
   manifest: "/manifest.webmanifest",
+  category: "government",
   icons: {
     icon: "/favicon.ico",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
   },
 };
 
@@ -40,8 +50,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <RootLayoutClient>
-      {children}
-    </RootLayoutClient>
+    <html lang="en" className="dark">
+      <body className="bg-background text-on-background font-body-md antialiased">
+        <RootLayoutClient>
+          {children}
+        </RootLayoutClient>
+      </body>
+    </html>
   );
 }

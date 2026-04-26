@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useAppStore } from "@/stores/useAppStore";
 
 export function RootLayoutClient({
@@ -9,11 +10,13 @@ export function RootLayoutClient({
 }) {
   const { isHighContrast } = useAppStore();
 
-  return (
-    <html lang="en" className={`dark ${isHighContrast ? 'high-contrast' : ''}`}>
-      <body className="bg-background text-on-background font-body-md antialiased">
-        {children}
-      </body>
-    </html>
-  );
+  useEffect(() => {
+    if (isHighContrast) {
+      document.documentElement.classList.add('high-contrast');
+    } else {
+      document.documentElement.classList.remove('high-contrast');
+    }
+  }, [isHighContrast]);
+
+  return <>{children}</>;
 }

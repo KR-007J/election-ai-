@@ -8,17 +8,24 @@ import { useAppStore } from "@/stores/useAppStore";
 export function CampaignSettings() {
   const [saveMessage, setSaveMessage] = React.useState("");
   const { isHighContrast, toggleHighContrast } = useAppStore();
+  const [preferences, setPreferences] = React.useState([
+    { id: "notif-email", label: "Email Bulletins", description: "Receive official election updates and deadline reminders via email.", active: true },
+    { id: "notif-sms", label: "SMS Alerts", description: "Get real-time text alerts for polling place changes or emergency updates.", active: false },
+    { id: "accessibility", label: "Accessibility Support", description: "Request on-site assistance or specialized equipment for in-person voting.", active: false },
+  ]);
   const tabs: Array<{ label: string; icon: AppIconName }> = [
     { label: "Account Security", icon: "verified" },
     { label: "Accessibility", icon: "elderly" },
     { label: "Language", icon: "description" },
     { label: "Data Privacy", icon: "settings" },
   ];
-  const preferences = [
-    { id: "notif-email", label: "Email Bulletins", description: "Receive official election updates and deadline reminders via email.", active: true },
-    { id: "notif-sms", label: "SMS Alerts", description: "Get real-time text alerts for polling place changes or emergency updates.", active: false },
-    { id: "accessibility", label: "Accessibility Support", description: "Request on-site assistance or specialized equipment for in-person voting.", active: false },
-  ];
+  const togglePreference = (id: string) => {
+    setPreferences((current) =>
+      current.map((preference) =>
+        preference.id === id ? { ...preference, active: !preference.active } : preference,
+      ),
+    );
+  };
 
   return (
     <div className="space-y-8 max-w-screen-container-max mx-auto">
@@ -62,9 +69,15 @@ export function CampaignSettings() {
                     <h4 className="text-white font-bold mb-1 group-hover:text-primary transition-colors">{pref.label}</h4>
                     <p className="text-xs text-slate-500 leading-relaxed">{pref.description}</p>
                   </div>
-                  <div aria-hidden="true" className={`w-12 h-6 rounded-full relative transition-all cursor-pointer ${pref.active ? "bg-primary" : "bg-slate-700"}`}>
-                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-md ${pref.active ? "right-1" : "left-1"}`}></div>
-                  </div>
+                  <button
+                    type="button"
+                    aria-pressed={pref.active}
+                    aria-label={`${pref.active ? "Disable" : "Enable"} ${pref.label}`}
+                    onClick={() => togglePreference(pref.id)}
+                    className={`w-12 h-6 rounded-full relative transition-all cursor-pointer ${pref.active ? "bg-primary" : "bg-slate-700"}`}
+                  >
+                    <div aria-hidden="true" className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-md ${pref.active ? "right-1" : "left-1"}`}></div>
+                  </button>
                 </div>
               ))}
             </div>
@@ -143,7 +156,7 @@ export function CampaignSettings() {
       {/* Action Footer */}
       <div className="flex items-center justify-end gap-6 pt-6 border-t border-white/5">
         {saveMessage && (
-          <p className="mr-auto text-xs font-bold uppercase tracking-[0.2em] text-primary">
+          <p aria-live="polite" className="mr-auto text-xs font-bold uppercase tracking-[0.2em] text-primary">
             {saveMessage}
           </p>
         )}
