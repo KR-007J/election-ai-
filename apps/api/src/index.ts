@@ -10,6 +10,7 @@ import { Index } from "@upstash/vector";
 import { desc } from "drizzle-orm";
 import { db } from "./db";
 import * as schema from "./db/schema";
+import { AVAILABLE_MODELS } from "./constants";
 
 dotenv.config();
 
@@ -186,11 +187,7 @@ fastify.get("/health", async () => ({
 
 /**
  * Widely available models in order of preference
- * 1.5 Flash is the most accessible (low latency, high quota)
- * 1.5 Pro is for complex reasoning
- * 1.0 Pro is the stable legacy baseline
  */
-const AVAILABLE_MODELS = ["gemini-1.5-flash-latest", "gemini-1.5-pro-latest", "gemini-1.0-pro"];
 
 type ChatHistory = Array<{
   role: "user" | "model";
