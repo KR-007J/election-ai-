@@ -4,7 +4,13 @@ import React, { useState, useRef, useEffect } from "react";
 import { useAppStore } from "@/stores/useAppStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { buildApiUrl } from "@/lib/api";
+import { initAnalytics } from "@/lib/firebase";
+import { logEvent } from "firebase/analytics";
 
+/**
+ * ChatAssistant component provides an AI-powered conversational interface 
+ * using the Gemini API. It includes offline fallbacks and accessibility features.
+ */
 export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
   const { isChatOpen, toggleChat, messages, addMessage } = useAppStore();
   const [inputValue, setInputValue] = useState("");
@@ -26,7 +32,7 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
       return "Voter ID requirements vary by state. Most states require some form of ID, but 8 states have no requirement. Check your state's election office for specifics.";
     }
     if (lowerQuery.includes('when') || lowerQuery.includes('election') || lowerQuery.includes('date')) {
-      return "The next presidential election is on November 5, 2024. Early voting begins in most states 4-6 weeks before Election Day.";
+      return "The next major election events are the 2026 Midterms. Primary season is currently underway. Check the Timeline section for specific district milestones.";
     }
     return "I'm currently offline, but I can help with basic voting information. For detailed assistance, please ensure the AI service is configured properly.";
   };
@@ -38,6 +44,12 @@ export const ChatAssistant = ({ inline = false }: { inline?: boolean }) => {
     addMessage(userMessage);
     setInputValue("");
     setIsLoading(true);
+
+    // Track chat engagement
+    const analytics = await initAnalytics();
+    if (analytics) {
+      logEvent(analytics, 'chat_message_sent', { length: inputValue.length });
+    }
 
     try {
       const history = messages.map((message) => ({

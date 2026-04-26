@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { auth, googleProvider, isFirebaseConfigured } from "@/lib/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { AppIcon } from "@/components/ui/AppIcon";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,9 +24,8 @@ export default function LoginPage() {
     try {
       await signInWithPopup(auth, googleProvider);
       router.push("/");
-    } catch (err: unknown) {
-      console.error(err);
-      setError(err instanceof Error ? err.message : "Failed to sign in with Google.");
+    } catch {
+      setError("Google sign-in failed. Please try again or verify Firebase configuration.");
     } finally {
       setLoading(false);
     }
@@ -45,12 +45,10 @@ export default function LoginPage() {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="w-full max-w-[480px]"
         >
-          <div className="glass-panel rounded-[3.5rem] border border-white/5 p-10 text-center shadow-[0_40px_80px_-15px_rgba(0,0,0,0.6)] backdrop-blur-3xl md:p-14">
+          <main className="glass-panel rounded-[3.5rem] border border-white/5 p-10 text-center shadow-[0_40px_80px_-15px_rgba(0,0,0,0.6)] backdrop-blur-3xl md:p-14">
             <div className="mb-12">
               <div className="group relative mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/10 to-white/5 shadow-2xl">
-                <span className="material-symbols-outlined text-5xl text-primary transition-transform duration-500 group-hover:rotate-12">
-                  account_balance
-                </span>
+                <AppIcon name="account_balance" className="h-12 w-12 text-primary transition-transform duration-500 group-hover:rotate-12" />
                 <div className="absolute inset-0 rounded-full bg-primary/20 opacity-0 blur-2xl transition-opacity group-hover:opacity-100" />
               </div>
               <h1 className="mb-6 text-4xl font-black leading-[1.1] tracking-tighter text-white md:text-6xl max-w-sm mx-auto">
@@ -64,8 +62,10 @@ export default function LoginPage() {
 
             <div className="space-y-8">
               <button
+                type="button"
                 onClick={handleGoogleLogin}
                 disabled={loading || !isFirebaseConfigured}
+                aria-busy={loading}
                 className="group relative flex w-full items-center justify-center gap-5 overflow-hidden rounded-2xl bg-white py-5 text-sm font-black uppercase tracking-[0.2em] text-black shadow-[0_20px_40px_-10px_rgba(255,255,255,0.2)] transition-all hover:bg-slate-100 active:scale-[0.98] disabled:opacity-50"
               >
                 <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-black/5 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
@@ -102,6 +102,7 @@ export default function LoginPage() {
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
+                  role="alert"
                   className="rounded-xl border border-red-500/20 bg-red-500/10 py-4 text-[10px] font-black uppercase tracking-widest text-red-400"
                 >
                   {error}
@@ -118,18 +119,18 @@ export default function LoginPage() {
                 <p className="text-[11px] font-medium leading-relaxed text-slate-500">
                   By accessing this intelligence portal, you authorize secure <br className="hidden md:block" />
                   validation of your identity and agree to the <br className="hidden md:block" />
-                  <span className="cursor-pointer font-bold text-primary/70 underline decoration-dotted underline-offset-4 transition-colors hover:text-primary">
+                  <a href="#terms" className="font-bold text-primary/70 underline decoration-dotted underline-offset-4 transition-colors hover:text-primary">
                     Terms of Command
-                  </span>{" "}
+                  </a>{" "}
                   and{" "}
-                  <span className="cursor-pointer font-bold text-primary/70 underline decoration-dotted underline-offset-4 transition-colors hover:text-primary">
+                  <a href="#privacy" className="font-bold text-primary/70 underline decoration-dotted underline-offset-4 transition-colors hover:text-primary">
                     Privacy Protocol
-                  </span>
+                  </a>
                   .
                 </p>
               </div>
             </div>
-          </div>
+          </main>
 
           <div className="mt-12 space-y-2 text-center">
             <p className="text-[10px] font-black uppercase tracking-[0.6em] text-slate-700">

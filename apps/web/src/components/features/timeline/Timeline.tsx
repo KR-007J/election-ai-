@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getTimelineEvents } from "@/actions/electionData";
+import { AppIcon } from "@/components/ui/AppIcon";
 
 interface TimelineItem {
   id: number;
@@ -193,9 +194,10 @@ export const Timeline = () => {
   if (error) {
     return (
       <div className="py-20 text-center">
-        <span className="material-symbols-outlined text-red-400 mb-4 text-4xl">error</span>
+        <AppIcon name="help" className="mx-auto mb-4 h-10 w-10 text-red-400" />
         <p className="text-red-400 mb-4">{error}</p>
         <button
+          type="button"
           onClick={() => window.location.reload()}
           className="bg-primary px-6 py-3 rounded-xl font-bold text-white"
         >
@@ -208,7 +210,7 @@ export const Timeline = () => {
   if (timelineData.length === 0) {
     return (
       <div className="py-20 text-center">
-        <span className="material-symbols-outlined text-yellow-400 mb-4 text-4xl">info</span>
+        <AppIcon name="help" className="mx-auto mb-4 h-10 w-10 text-yellow-400" />
         <p className="text-slate-400">No timeline events available.</p>
       </div>
     );
@@ -227,7 +229,7 @@ export const Timeline = () => {
       {/* Sources and Verification */}
       <div className="mt-12 rounded-xl bg-blue-500/10 border border-blue-500/20 p-6">
         <div className="flex items-start gap-3">
-          <span className="material-symbols-outlined text-blue-400 mt-0.5">verified</span>
+          <AppIcon name="verified" className="mt-0.5 h-5 w-5 text-blue-400" />
           <div>
             <h4 className="text-sm font-bold text-blue-400 mb-2">Information Sources</h4>
             <p className="text-xs text-slate-300 leading-relaxed mb-3">

@@ -1,8 +1,9 @@
 import { initializeApp } from "firebase/app";
-import { getAnalytics, isSupported } from "firebase/analytics";
+import { getAnalytics, isSupported as isAnalyticsSupported } from "firebase/analytics";
+import { getPerformance } from "firebase/performance";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
-const requiredFirebaseConfig = {
+export const requiredFirebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
@@ -10,6 +11,10 @@ const requiredFirebaseConfig = {
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
+
+export const isFirebaseConfigured = Object.values(requiredFirebaseConfig).every(
+  (value) => typeof value === "string" && value.trim().length > 0,
+);
 
 const firebaseConfig = {
   apiKey: requiredFirebaseConfig.apiKey ?? "dev-missing-api-key",
@@ -24,17 +29,33 @@ const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
-export const isFirebaseConfigured = Object.values(requiredFirebaseConfig).every(Boolean);
+googleProvider.setCustomParameters({
+  prompt: "select_account",
+});
 
 export const initAnalytics = async () => {
-  if (typeof window !== "undefined") {
-    const supported = await isSupported();
-    if (supported && isFirebaseConfigured) {
-      return getAnalytics(app);
-    }
+  if (typeof window === "undefined" || !isFirebaseConfigured) {
+    return null;
   }
 
-  return null;
+  try {
+    const supported = await isAnalyticsSupported();
+    return supported ? getAnalytics(app) : null;
+  } catch {
+    return null;
+  }
+};
+
+export const initPerformance = () => {
+  if (typeof window === "undefined" || !isFirebaseConfigured) {
+    return null;
+  }
+  
+  try {
+    return getPerformance(app);
+  } catch {
+    return null;
+  }
 };
 
 export default app;

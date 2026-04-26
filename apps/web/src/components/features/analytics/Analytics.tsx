@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { AppIcon, type AppIconName } from "@/components/ui/AppIcon";
 
 export function Analytics() {
   const [syncMessage, setSyncMessage] = useState("");
@@ -21,6 +22,7 @@ export function Analytics() {
         </div>
         <div className="flex flex-col items-end gap-2">
           <button
+            type="button"
             onClick={() => {
               setSyncMessage("Calendar sync queued");
               window.setTimeout(() => setSyncMessage(""), 2500);
@@ -100,7 +102,7 @@ export function Analytics() {
               </motion.div>
             ))}
           </div>
-          <button className="w-full py-4 border border-dashed border-white/20 rounded-xl text-[10px] text-slate-500 uppercase font-black tracking-widest hover:border-primary hover:text-primary transition-all">
+          <button type="button" className="w-full py-4 border border-dashed border-white/20 rounded-xl text-[10px] text-slate-500 uppercase font-black tracking-widest hover:border-primary hover:text-primary transition-all">
             View Full Schedule
           </button>
         </motion.div>
@@ -108,11 +110,14 @@ export function Analytics() {
 
       {/* Participation Breakdown */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { label: "District Rank", value: "#4 of 12", sub: "Top 33% in Turnout", icon: "military_tech", color: "#FFD700" },
-          { label: "Active Voters", value: "84,291", sub: "+2.4% vs Last Month", icon: "person_check", color: "#00E5FF" },
+        {(() => {
+          const metrics: Array<{ label: string; value: string; sub: string; icon: AppIconName; color: string }> = [
+          { label: "District Rank", value: "#4 of 12", sub: "Top 33% in Turnout", icon: "verified", color: "#FFD700" },
+          { label: "Active Voters", value: "84,291", sub: "+2.4% vs Last Month", icon: "person", color: "#00E5FF" },
           { label: "Registered Mail", value: "12.5k", sub: "Requested Ballots", icon: "mail", color: "#7000FF" },
-        ].map((metric, i) => (
+          ];
+
+          return metrics.map((metric, i) => (
           <motion.div
             key={metric.label}
             initial={{ opacity: 0, y: 20 }}
@@ -121,7 +126,7 @@ export function Analytics() {
             className="glass-panel p-lg rounded-2xl inner-glow flex items-center gap-6 border border-white/5"
           >
             <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10">
-              <span className="material-symbols-outlined text-2xl" style={{ color: metric.color }}>{metric.icon}</span>
+              <AppIcon name={metric.icon} className="h-7 w-7" style={{ color: metric.color }} />
             </div>
             <div>
               <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">{metric.label}</p>
@@ -129,7 +134,8 @@ export function Analytics() {
               <p className="text-[10px] text-primary font-bold mt-1 opacity-70">{metric.sub}</p>
             </div>
           </motion.div>
-        ))}
+          ));
+        })()}
       </div>
     </div>
   );

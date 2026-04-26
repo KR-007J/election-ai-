@@ -1,16 +1,6 @@
-import type { Metadata } from "next";
-import { Space_Grotesk, Manrope } from "next/font/google";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-space-grotesk",
-});
-
-const manrope = Manrope({
-  subsets: ["latin"],
-  variable: "--font-manrope",
-});
+import { RootLayoutClient } from "@/components/layout/RootLayoutClient";
 
 export const metadata: Metadata = {
   title: "Election AI Assistant | Intelligence Command for Voters",
@@ -30,8 +20,18 @@ export const metadata: Metadata = {
     title: "Election AI Assistant",
     description: "Empowering voters with non-partisan intelligence and accessibility.",
   },
-  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
   robots: "index, follow",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/favicon.ico",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#00E5FF",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({
@@ -40,10 +40,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${spaceGrotesk.variable} ${manrope.variable} bg-background text-on-background font-body-md antialiased`}>
-        {children}
-      </body>
-    </html>
+    <RootLayoutClient>
+      {children}
+    </RootLayoutClient>
   );
 }

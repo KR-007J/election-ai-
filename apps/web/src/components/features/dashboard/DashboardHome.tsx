@@ -6,13 +6,15 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { useAppStore } from "@/stores/useAppStore";
 import { buildApiUrl } from "@/lib/api";
 
+import { AppIcon, type AppIconName } from "@/components/ui/AppIcon";
+
 interface Bulletin {
   title: string;
   category: string;
   time: string;
   urgent: boolean;
   description?: string;
-  icon?: string;
+  icon?: AppIconName;
 }
 
 export function DashboardHome() {
@@ -46,9 +48,9 @@ export function DashboardHome() {
   }, []);
 
   const voterStats = [
-    { label: "Days Until Election", value: "12", change: "Final Stretch", icon: "timer", color: "#FF3D00" },
-    { label: "District Participation", value: "82.4%", change: "+4.1% vs 2022", icon: "how_to_vote", color: "#00E5FF" },
-    { label: "Registration Status", value: "Active", change: "Verified", icon: "verified", color: "#7000FF" },
+    { label: "Days Until Election", value: "12", change: "Final Stretch", icon: "timer" as AppIconName, color: "#FF3D00" },
+    { label: "District Participation", value: "82.4%", change: "+4.1% vs 2022", icon: "how_to_vote" as AppIconName, color: "#00E5FF" },
+    { label: "Registration Status", value: "Active", change: "Verified", icon: "verified" as AppIconName, color: "#7000FF" },
   ];
 
   return (
@@ -80,7 +82,7 @@ export function DashboardHome() {
             </div>
             <div className="w-px h-16 bg-white/10"></div>
             <div className="w-20 h-20 rounded-2xl bg-primary/20 flex items-center justify-center border border-primary/30 relative">
-              <span className="material-symbols-outlined text-primary text-4xl">account_balance</span>
+              <AppIcon name="account_balance" className="text-primary h-10 w-10" />
               <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full"></div>
             </div>
           </div>
@@ -101,7 +103,7 @@ export function DashboardHome() {
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-8">
                 <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined text-3xl" style={{ color: stat.color }}>{stat.icon}</span>
+                  <AppIcon name={stat.icon} className="h-8 w-8" style={{ color: stat.color }} />
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10">{stat.change}</span>
               </div>
@@ -129,13 +131,13 @@ export function DashboardHome() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
-                { title: "Verify Registration", icon: "assignment_ind", status: "Verified", color: "text-green-400", bg: "bg-green-500/10", border: "border-green-500/20" },
-                { title: "Sample Ballot", icon: "description", status: "Available", color: "text-primary", bg: "bg-primary/10", border: "border-primary/20" },
-                { title: "Polling Directions", icon: "map", status: "Pending", color: "text-slate-500", bg: "bg-white/5", border: "border-white/10" },
+                { title: "Verify Registration", icon: "assignment_ind" as AppIconName, status: "Verified", color: "text-green-400", bg: "bg-green-500/10", border: "border-green-500/20" },
+                { title: "Sample Ballot", icon: "description" as AppIconName, status: "Available", color: "text-primary", bg: "bg-primary/10", border: "border-primary/20" },
+                { title: "Polling Directions", icon: "map" as AppIconName, status: "Pending", color: "text-slate-500", bg: "bg-white/5", border: "border-white/10" },
               ].map((task) => (
                 <button key={task.title} className={`p-8 rounded-2xl bg-white/5 border ${task.border} hover:scale-[1.02] transition-all text-left group`}>
                   <div className={`w-12 h-12 rounded-xl ${task.bg} flex items-center justify-center mb-6 transition-transform group-hover:scale-110`}>
-                    <span className={`material-symbols-outlined text-2xl ${task.color}`}>{task.icon}</span>
+                    <AppIcon name={task.icon} className={`h-6 w-6 ${task.color}`} />
                   </div>
                   <p className="text-white font-bold text-lg mb-2">{task.title}</p>
                   <p className={`text-[10px] font-black uppercase ${task.color}`}>{task.status}</p>
@@ -192,7 +194,7 @@ export function DashboardHome() {
                 disabled={isLoading}
                 className="w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl transition-all disabled:opacity-30 border border-white/5"
               >
-                <span className={`material-symbols-outlined text-slate-400 text-xl ${isLoading ? 'animate-spin' : ''}`}>refresh</span>
+                <AppIcon name="refresh" className={`text-slate-400 h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
               </button>
             </div>
             
@@ -232,6 +234,12 @@ export function DashboardHome() {
                     </p>
                     {bulletin.description && (
                       <p className="text-sm text-slate-500 leading-relaxed font-medium line-clamp-3">{bulletin.description}</p>
+                    )}
+                    {bulletin.icon && (
+                      <div className="mt-4 flex items-center gap-2 opacity-50">
+                        <AppIcon name={bulletin.icon} className="h-4 w-4" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Resource</span>
+                      </div>
                     )}
                   </motion.div>
                 ))

@@ -1,15 +1,22 @@
 {
   "name": "electiq",
   "private": true,
+  "engines": {
+    "node": ">=20 <21",
+    "npm": ">=10 <11"
+  },
   "scripts": {
     "build": "turbo build",
+    "build:web": "turbo build --filter=web",
+    "ci": "npm run lint && npm run build:web",
     "dev": "turbo dev",
     "lint": "turbo lint",
+    "test": "npm run test --workspace web",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
     "prettier": "^3.2.5",
-    "turbo": "latest"
+    "turbo": "2.9.6"
   },
   "packageManager": "npm@10.2.4",
   "workspaces": [

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '@/stores/useAppStore';
+import { AppIcon, type AppIconName } from '@/components/ui/AppIcon';
 
 const questions = [
   {
@@ -110,28 +111,39 @@ const questions = [
 export default function ElectionQuiz() {
   const { setActiveSection } = useAppStore();
   const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [isFinished, setIsFinished] = useState(false);
+  const [answers, setAnswers] = useState<Record<string, string>>(() => {
+    if (typeof window === 'undefined') {
+      return {};
+    }
+
+    try {
+      const saved = localStorage.getItem('election-quiz-results');
+      return saved ? JSON.parse(saved).answers ?? {} : {};
+    } catch {
+      return {};
+    }
+  });
+  const [isFinished, setIsFinished] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    try {
+      return Boolean(localStorage.getItem('election-quiz-results'));
+    } catch {
+      return false;
+    }
+  });
 
   // Voice guidance
   const speakText = (text: string) => {
-    if ('speechSynthesis' in window) {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = 0.8;
       utterance.pitch = 1;
       speechSynthesis.speak(utterance);
     }
   };
-
-  // Load saved quiz results on mount
-  React.useEffect(() => {
-    const saved = localStorage.getItem('election-quiz-results');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setAnswers(parsed.answers);
-      setIsFinished(true); // eslint-disable-line react-hooks/set-state-in-effect
-    }
-  }, []); // Empty dependency array is correct here
 
   // Calculate profile based on answers
   const calculateProfile = React.useCallback((answers: Record<string, string>) => {
@@ -199,7 +211,7 @@ export default function ElectionQuiz() {
             <p className="text-slate-500 mt-2">Discover which candidates align with your core values.</p>
             {isFinished && (
               <div className="mt-3 flex items-center gap-2">
-                <span className="text-sm text-green-400 font-medium">✓ Quiz completed</span>
+                <span className="text-sm text-green-400 font-medium">Quiz completed</span>
                 <span className="text-xs text-slate-500">Results saved automatically</span>
               </div>
             )}
@@ -261,7 +273,7 @@ export default function ElectionQuiz() {
             className="text-center py-12"
           >
             <div className="w-24 h-24 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center text-4xl mx-auto mb-8 shadow-[0_0_40px_rgba(34,197,94,0.2)]">
-              OK
+              <AppIcon name="check_circle" className="h-12 w-12 text-green-400" />
             </div>
             <h2 className="text-4xl font-bold text-white mb-4">Profile Generated</h2>
             <p className="text-slate-400 text-lg mb-12 max-w-[480px] mx-auto">
@@ -271,13 +283,15 @@ export default function ElectionQuiz() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
               {(() => {
                 const profile = calculateProfile(answers);
-                return [
-                  { label: "Primary Value", val: profile.primaryValue.charAt(0).toUpperCase() + profile.primaryValue.slice(1), icon: "bolt" },
-                  { label: "Top Concern", val: profile.topConcern, icon: "shield" },
-                  { label: "Economic View", val: profile.economicView, icon: "eco" },
-                ].map((trait) => (
+                const traits: Array<{ label: string; val: string; icon: AppIconName }> = [
+                  { label: "Primary Value", val: profile.primaryValue.charAt(0).toUpperCase() + profile.primaryValue.slice(1), icon: "verified" },
+                  { label: "Top Concern", val: profile.topConcern, icon: "how_to_vote" },
+                  { label: "Economic View", val: profile.economicView, icon: "dashboard" },
+                ];
+
+                return traits.map((trait) => (
                   <div key={trait.label} className="p-8 rounded-2xl bg-white/5 border border-white/5 text-center">
-                    <span className="material-symbols-outlined text-primary mb-4 text-3xl">{trait.icon}</span>
+                    <AppIcon name={trait.icon} className="mx-auto mb-4 h-8 w-8 text-primary" />
                     <p className="text-[10px] text-slate-500 font-black uppercase mb-2">{trait.label}</p>
                     <p className="text-2xl text-white font-bold">{trait.val}</p>
                   </div>
@@ -287,6 +301,7 @@ export default function ElectionQuiz() {
 
             <div className="flex flex-col md:flex-row gap-6 justify-center">
               <button
+                type="button"
                 onClick={() => {
                   setActiveSection('candidates');
                   speakText("Viewing candidates that match your preferences");
@@ -297,6 +312,7 @@ export default function ElectionQuiz() {
                 View Matched Candidates
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setIsFinished(false);
                   setCurrentStep(0);

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getVoterGuideSteps } from '@/actions/electionData';
+import { AppIcon, type AppIconName } from '@/components/ui/AppIcon';
 
 interface VoterGuideStep {
   id: number;
@@ -38,6 +39,7 @@ export const VoterGuide = () => {
   }, []);
 
   const step = steps[currentStep];
+  const normalizedTip = step?.tip.replace(/<\/?strong>/g, "").trim() ?? "";
 
   if (loading) {
     return (
@@ -51,9 +53,10 @@ export const VoterGuide = () => {
   if (error) {
     return (
       <div className="text-center py-20">
-        <span className="material-symbols-outlined text-red-400 mb-4 text-4xl">error</span>
+        <AppIcon name="help" className="mx-auto mb-4 h-10 w-10 text-red-400" />
         <p className="text-red-400 mb-4">{error}</p>
         <button
+          type="button"
           onClick={() => window.location.reload()}
           className="bg-primary px-6 py-3 rounded-xl font-bold text-white"
         >
@@ -66,7 +69,7 @@ export const VoterGuide = () => {
   if (!step) {
     return (
       <div className="text-center py-20">
-        <span className="material-symbols-outlined text-yellow-400 mb-4 text-4xl">info</span>
+        <AppIcon name="help" className="mx-auto mb-4 h-10 w-10 text-yellow-400" />
         <p className="text-slate-400">No guide steps available.</p>
       </div>
     );
@@ -93,7 +96,7 @@ export const VoterGuide = () => {
                   border: `1px solid ${currentStep === i ? 'rgba(66, 133, 244, 0.3)' : 'rgba(255, 255, 255, 0.05)'}`,
                 }}
               >
-                <span className="material-symbols-outlined notranslate text-xl lg:text-2xl shrink-0 transition-transform duration-300" style={{ transform: currentStep === i ? 'scale(1.1)' : 'scale(1)' }}>{s.icon}</span>
+                <AppIcon name={s.icon as AppIconName} className="h-5 w-5 shrink-0 transition-transform duration-300 lg:h-6 lg:w-6" />
                 <div className="min-w-0">
                   <div className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest mb-0.5 lg:mb-1 opacity-40">Step {s.id}</div>
                   <div className="text-xs lg:text-sm font-bold truncate" style={{ color: currentStep === i ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}>{s.title}</div>
@@ -116,7 +119,7 @@ export const VoterGuide = () => {
             {/* Step Header */}
             <div className="flex items-center gap-6 mb-10">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-glow" style={{ background: 'var(--color-surface-overlay)', border: '1px solid var(--color-border)' }}>
-                <span className="material-symbols-outlined notranslate text-4xl">{step.icon}</span>
+                <AppIcon name={step.icon as AppIconName} className="h-9 w-9" />
               </div>
               <div>
                 <div className="badge badge-accent mb-2">Preparation Phase</div>
@@ -151,21 +154,34 @@ export const VoterGuide = () => {
                 <div className="w-2 h-2 rounded-full" style={{ background: 'var(--color-accent)' }} />
                 <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--color-accent)' }}>Expert Tip</span>
               </div>
-              <div className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }} dangerouslySetInnerHTML={{ __html: step.tip }} />
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
+                {normalizedTip}
+              </p>
             </div>
 
             {/* Elderly-friendly help */}
             <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 mb-6">
               <div className="flex items-start gap-3">
-                <span className="material-symbols-outlined text-yellow-400 mt-0.5">elderly</span>
+                <AppIcon name="elderly" className="mt-0.5 h-5 w-5 text-yellow-400" />
                 <div>
                   <h4 className="text-sm font-bold text-yellow-400 mb-1">Need Help?</h4>
                   <p className="text-xs text-slate-300 mb-2">
                     If you need assistance with any step, contact your local election office or senior center.
                   </p>
-                  <button className="text-xs bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded hover:bg-yellow-500/30 transition-colors">
-                    Find Help Near You
-                  </button>
+                  <div className="flex gap-2">
+                    <button type="button" className="text-xs bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded hover:bg-yellow-500/30 transition-colors">
+                      Find Help Near You
+                    </button>
+                    <a 
+                      href="https://www.google.com/maps/search/polling+place+near+me" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-xs bg-primary/20 text-primary px-3 py-1 rounded hover:bg-primary/30 transition-colors flex items-center gap-1.5"
+                    >
+                      <AppIcon name="map" className="h-3 w-3" />
+                      Locate Polling Place
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -173,6 +189,7 @@ export const VoterGuide = () => {
             {/* Navigation */}
             <div className="flex justify-between items-center pt-6" style={{ borderTop: '1px solid var(--color-border)' }}>
               <button
+                type="button"
                 onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
                 disabled={currentStep === 0}
                 aria-label="Go to previous step"
@@ -186,6 +203,7 @@ export const VoterGuide = () => {
               <div className="flex gap-1.5">
                 {steps.map((_, i) => (
                   <button
+                    type="button"
                     key={i}
                     onClick={() => setCurrentStep(i)}
                     aria-label={`Go to step ${i + 1}`}
@@ -200,6 +218,7 @@ export const VoterGuide = () => {
               </div>
 
               <button
+                type="button"
                 onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
                 disabled={currentStep === steps.length - 1}
                 aria-label="Go to next step"

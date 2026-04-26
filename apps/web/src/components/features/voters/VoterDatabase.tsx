@@ -3,16 +3,9 @@
 import React, { useState } from "react";
 import { useAppStore } from "@/stores/useAppStore";
 import { motion, AnimatePresence } from "framer-motion";
+import { AppIcon } from "@/components/ui/AppIcon";
 
-interface Candidate {
-  name: string;
-  office: string;
-  party: string;
-  alignment: number;
-  platform: string;
-  avatar: string;
-  focus: string;
-}
+import { getAdjustedCandidates, type Candidate } from "@/lib/voterLogic";
 
 export function VoterDatabase() {
   const { setActiveSection } = useAppStore();
@@ -26,30 +19,10 @@ export function VoterDatabase() {
   ], []);
 
   // Adjust alignments based on quiz results
-  const [candidates, setCandidates] = React.useState<Candidate[]>(baseCandidates);
-
-  React.useEffect(() => {
-    const quizResults = localStorage.getItem('election-quiz-results');
-    if (quizResults) {
-      const parsed = JSON.parse(quizResults);
-      const profile = parsed.profile.primaryValue.toLowerCase();
-
-      // Adjust alignments based on user profile
-      const adjustedCandidates = baseCandidates.map(candidate => {
-        let alignment = candidate.alignment;
-        if (profile === candidate.focus) {
-          alignment = Math.min(100, alignment + 15); // Boost alignment for matching focus
-        } else if (Math.abs(alignment - 50) > 20) {
-          alignment = Math.max(0, alignment - 10); // Slight penalty for mismatch
-        }
-        return { ...candidate, alignment };
-      });
-
-      // Sort by alignment descending
-      adjustedCandidates.sort((a, b) => b.alignment - a.alignment);
-      setCandidates(adjustedCandidates); // eslint-disable-line react-hooks/set-state-in-effect
-    }
-  }, [baseCandidates]); // Include baseCandidates as dependency
+  const sortedCandidates = React.useMemo(() => {
+    const quizResults = typeof window !== 'undefined' ? localStorage.getItem('election-quiz-results') : null;
+    return getAdjustedCandidates(baseCandidates, quizResults);
+  }, [baseCandidates]);
 
   const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
   const [activeRecord, setActiveRecord] = useState<Candidate | null>(null);
@@ -60,6 +33,15 @@ export function VoterDatabase() {
       prev.includes(name) ? prev.filter((candidateName) => candidateName !== name) : [...prev, name].slice(-2),
     );
   };
+
+  const modalCloseRef = React.useRef<HTMLButtonElement>(null);
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+
+  React.useEffect(() => {
+    if (!activeRecord && !isComparing && triggerRef.current) {
+      triggerRef.current.focus();
+    }
+  }, [activeRecord, isComparing]);
 
   return (
     <div className="relative space-y-8">
@@ -75,13 +57,18 @@ export function VoterDatabase() {
         <div className="flex gap-3">
           {selectedCandidates.length > 1 && (
             <button
-              onClick={() => setIsComparing(true)}
+              type="button"
+              onClick={(e) => {
+                triggerRef.current = e.currentTarget;
+                setIsComparing(true);
+              }}
               className="rounded-xl bg-purple-500 px-6 py-3 font-bold text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] animate-pulse"
             >
               Compare ({selectedCandidates.length})
             </button>
           )}
           <button
+            type="button"
             onClick={() => setActiveSection("quiz")}
             className="rounded-xl bg-primary px-8 py-3 font-bold text-white transition-all hover:shadow-[0_0_20px_rgba(0,229,255,0.3)]"
           >
@@ -90,16 +77,16 @@ export function VoterDatabase() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {candidates.map((candidate, index) => (
+      <div role="list" className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        {sortedCandidates.map((candidate, index) => (
           <motion.div
+            role="listitem"
             key={candidate.name}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className={`glass-panel group relative overflow-hidden rounded-[2rem] border p-8 transition-all ${
-              selectedCandidates.includes(candidate.name) ? "border-primary/50 bg-primary/5" : "border-white/5 bg-surface/30"
-            }`}
+            className={`glass-panel group relative overflow-hidden rounded-[2rem] border p-8 transition-all ${selectedCandidates.includes(candidate.name) ? "border-primary/50 bg-primary/5" : "border-white/5 bg-surface/30"
+              }`}
           >
             <div className="relative z-10 flex gap-6">
               <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-3xl font-h1 text-primary shadow-lg transition-transform group-hover:scale-105">
@@ -118,7 +105,9 @@ export function VoterDatabase() {
                       <p className="text-[10px] font-black uppercase text-slate-600">Alignment</p>
                       <span className="text-[8px] bg-green-500/20 text-green-400 px-1 py-0.5 rounded font-bold">Verified</span>
                     </div>
-                    <p className="font-h1 text-2xl text-primary">{candidate.alignment}%</p>
+                    <p className="font-h1 text-2xl text-primary" aria-label={`Alignment score: ${candidate.alignment}%`}>
+                      {candidate.alignment}%
+                    </p>
                   </div>
                 </div>
                 <div className="mt-6 space-y-4">
@@ -131,18 +120,22 @@ export function VoterDatabase() {
                   </div>
                   <div className="flex gap-3 pt-2">
                     <button
-                      onClick={() => setActiveRecord(candidate)}
+                      type="button"
+                      onClick={(e) => {
+                        triggerRef.current = e.currentTarget;
+                        setActiveRecord(candidate);
+                      }}
                       className="flex-1 rounded-xl border border-white/10 bg-white/5 py-3 text-[10px] font-black uppercase text-white transition-all hover:bg-white/10"
                     >
                       Voting Record
                     </button>
                     <button
+                      type="button"
                       onClick={() => toggleCompare(candidate.name)}
-                      className={`flex-1 rounded-xl border py-3 text-[10px] font-black uppercase transition-all ${
-                        selectedCandidates.includes(candidate.name)
+                      className={`flex-1 rounded-xl border py-3 text-[10px] font-black uppercase transition-all ${selectedCandidates.includes(candidate.name)
                           ? "border-primary bg-primary text-white"
                           : "border-white/10 bg-white/5 text-slate-400 hover:text-white"
-                      }`}
+                        }`}
                     >
                       {selectedCandidates.includes(candidate.name) ? "Selected" : "Compare"}
                     </button>
@@ -170,6 +163,9 @@ export function VoterDatabase() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="glass-panel relative w-full max-w-2xl rounded-[2rem] border border-white/10 bg-surface/80 p-10 shadow-2xl"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="candidate-record-title"
             >
               <div className="mb-8 flex items-start justify-between">
                 <div className="flex items-center gap-4">
@@ -177,12 +173,18 @@ export function VoterDatabase() {
                     {activeRecord.avatar}
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-white">{activeRecord.name}</h2>
+                    <h2 id="candidate-record-title" className="text-2xl font-bold text-white">{activeRecord.name}</h2>
                     <p className="font-medium text-slate-500">{activeRecord.office} | Historical Record</p>
                   </div>
                 </div>
-                <button onClick={() => setActiveRecord(null)} className="rounded-full p-2 hover:bg-white/5">
-                  <span className="material-symbols-outlined text-slate-400">close</span>
+                <button
+                  type="button"
+                  ref={modalCloseRef}
+                  autoFocus
+                  onClick={() => setActiveRecord(null)}
+                  className="rounded-full p-2 hover:bg-white/5"
+                >
+                  <AppIcon name="close" className="h-5 w-5 text-slate-400" />
                 </button>
               </div>
 
@@ -218,6 +220,7 @@ export function VoterDatabase() {
               </div>
 
               <button
+                type="button"
                 onClick={() => setActiveRecord(null)}
                 className="mt-10 w-full rounded-2xl bg-primary py-4 font-bold text-white shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95"
               >
@@ -243,11 +246,19 @@ export function VoterDatabase() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 30 }}
               className="glass-panel relative max-h-[85vh] w-full max-w-5xl overflow-y-auto rounded-[2.5rem] border border-white/10 bg-surface/80 p-12 shadow-2xl"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="comparison-title"
             >
               <div className="mb-12 flex items-center justify-between">
-                <h2 className="font-h1 text-3xl font-bold text-white">Head-to-Head Comparison</h2>
-                <button onClick={() => setIsComparing(false)} className="rounded-full p-3 transition-colors hover:bg-white/5">
-                  <span className="material-symbols-outlined text-slate-400">close</span>
+                <h2 id="comparison-title" className="font-h1 text-3xl font-bold text-white">Head-to-Head Comparison</h2>
+                <button
+                  type="button"
+                  autoFocus
+                  onClick={() => setIsComparing(false)}
+                  className="rounded-full p-3 transition-colors hover:bg-white/5"
+                >
+                  <AppIcon name="close" className="h-5 w-5 text-slate-400" />
                 </button>
               </div>
 
@@ -256,7 +267,7 @@ export function VoterDatabase() {
                   <div className="flex h-10 items-center text-[10px] font-black uppercase text-primary">Key Focus Areas</div>
                 </div>
                 {selectedCandidates
-                  .map((name) => candidates.find((candidate) => candidate.name === name))
+                  .map((name) => sortedCandidates.find((candidate) => candidate.name === name))
                   .map(
                     (candidate) =>
                       candidate && (
@@ -284,6 +295,7 @@ export function VoterDatabase() {
               </div>
 
               <button
+                type="button"
                 onClick={() => setIsComparing(false)}
                 className="mt-12 w-full rounded-2xl bg-gradient-to-r from-primary to-purple-500 py-5 font-bold text-white shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-98"
               >
@@ -296,7 +308,7 @@ export function VoterDatabase() {
 
       <div className="mt-12 rounded-xl bg-yellow-500/10 border border-yellow-500/20 p-6">
         <div className="flex items-start gap-3">
-          <span className="material-symbols-outlined text-yellow-400 mt-0.5">info</span>
+          <AppIcon name="help" className="mt-0.5 h-5 w-5 text-yellow-400" />
           <div>
             <h4 className="text-sm font-bold text-yellow-400 mb-2">Non-Partisan Information</h4>
             <p className="text-xs text-slate-300 leading-relaxed">

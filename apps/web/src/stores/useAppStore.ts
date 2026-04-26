@@ -14,6 +14,10 @@ interface AppState {
   toggleChat: () => void;
   messages: Message[];
   addMessage: (message: Message) => void;
+  isHighContrast: boolean;
+  toggleHighContrast: () => void;
+  engineStatus: 'connected' | 'reconnecting' | 'offline';
+  setEngineStatus: (status: 'connected' | 'reconnecting' | 'offline') => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -23,4 +27,8 @@ export const useAppStore = create<AppState>((set) => ({
   toggleChat: () => set((state) => ({ isChatOpen: !state.isChatOpen })),
   messages: [],
   addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
+  isHighContrast: false,
+  toggleHighContrast: () => set((state) => ({ isHighContrast: !state.isHighContrast })),
+  engineStatus: 'connected',
+  setEngineStatus: (status) => set({ engineStatus: status }),
 }));
